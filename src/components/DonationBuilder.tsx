@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import type { DonationCategory, DonationItem, DonationRecord, ValuationItem } from '../types/donation';
-import { CATEGORY_LABELS } from '../types/donation';
+import type { DonationCategory, DonationItem, DonationRecord, ValuationItem, ItemCondition } from '../types/donation';
+import { CATEGORY_LABELS, CONDITION_LABELS } from '../types/donation';
 import valuationGuide from '../data/valuationGuide.json';
 import { findNearbyDonationPlaces } from '../utils/nearbyPlaces';
 import type { NearbyPlace } from '../utils/nearbyPlaces';
@@ -42,6 +42,7 @@ const EMPTY_ITEM = {
   quantity: 1,
   unitValue: '',
   description: '',
+  condition: 'good' as ItemCondition,
   selectedPreset: '',
   suggestedRange: null as { low: number; high: number } | null,
 };
@@ -111,6 +112,7 @@ export function DonationBuilder({ editingRecord, onSave, onCancel }: DonationBui
       quantity: 1,
       unitValue: String(Math.round((guideItem.low + guideItem.high) / 2)),
       description: '',
+      condition: 'good' as ItemCondition,
       selectedPreset: guideItem.item,
       suggestedRange: { low: guideItem.low, high: guideItem.high },
     });
@@ -154,6 +156,7 @@ export function DonationBuilder({ editingRecord, onSave, onCancel }: DonationBui
       quantity: Math.max(1, Math.round(form.quantity)),
       unitValue: parseFloat(form.unitValue),
       description: form.description.trim(),
+      condition: form.condition,
     };
     setItems(prev => [...prev, newItem]);
     // Reset form but keep category for rapid entry; clear search
@@ -382,6 +385,19 @@ export function DonationBuilder({ editingRecord, onSave, onCancel }: DonationBui
               onChange={e => setForm(f => ({ ...f, quantity: parseInt(e.target.value) || 1 }))}
               className="w-full border border-irs-200 rounded px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-irs-400"
             />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-irs-600 mb-1">Condition</label>
+            <select
+              value={form.condition}
+              onChange={e => setForm(f => ({ ...f, condition: e.target.value as ItemCondition }))}
+              className="w-full border border-irs-200 rounded px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-irs-400"
+            >
+              {Object.entries(CONDITION_LABELS).map(([key, label]) => (
+                <option key={key} value={key}>{label}</option>
+              ))}
+            </select>
           </div>
 
           <div>

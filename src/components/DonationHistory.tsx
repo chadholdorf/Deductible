@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { DonationRecord } from '../types/donation';
-import { CATEGORY_LABELS, recordTotal } from '../types/donation';
+import { CATEGORY_LABELS, CONDITION_LABELS, recordTotal } from '../types/donation';
 
 interface DonationHistoryProps {
   records: DonationRecord[];
@@ -90,6 +90,9 @@ export function DonationHistory({ records, onEdit, onDelete }: DonationHistoryPr
                           <span className="text-irs-400 mr-1">{item.quantity}×</span>
                         )}
                         {item.itemName}
+                        {item.condition && (
+                          <span className="text-irs-400 ml-1">[{CONDITION_LABELS[item.condition]}]</span>
+                        )}
                         {item.description && (
                           <span className="text-irs-400 ml-1">— {item.description}</span>
                         )}

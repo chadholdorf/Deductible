@@ -5,6 +5,7 @@ import { DonationHistory } from './components/DonationHistory';
 import { Summary } from './components/Summary';
 import { ValuationModal } from './components/ValuationModal';
 import { ExportCSV } from './components/ExportCSV';
+import { PrintReport } from './components/PrintReport';
 import type { DonationRecord } from './types/donation';
 import { recordTotal } from './types/donation';
 
@@ -19,6 +20,7 @@ function App() {
   const [mode, setMode] = useState<Mode>('view');
   const [editingRecord, setEditingRecord] = useState<DonationRecord | null>(null);
   const [showValuation, setShowValuation] = useState(false);
+  const [showReport, setShowReport] = useState(false);
 
   // Available tax years — always include current year
   const taxYears = useMemo(() => {
@@ -80,10 +82,10 @@ function App() {
               Value Reference
             </button>
             <button
-              onClick={() => window.print()}
+              onClick={() => setShowReport(true)}
               className="px-4 py-2.5 border border-irs-600 text-irs-200 hover:bg-irs-800 active:bg-irs-700 rounded text-sm transition-colors min-h-[44px]"
             >
-              Print
+              Print Report
             </button>
           </div>
         </div>
@@ -157,6 +159,9 @@ function App() {
       </footer>
 
       <ValuationModal isOpen={showValuation} onClose={() => setShowValuation(false)} />
+      {showReport && (
+        <PrintReport records={yearRecords} taxYear={selectedYear} onClose={() => setShowReport(false)} />
+      )}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import type { DonationRecord } from '../types/donation';
-import { CATEGORY_LABELS } from '../types/donation';
+import { CATEGORY_LABELS, CONDITION_LABELS } from '../types/donation';
 
 interface ExportCSVProps {
   records: DonationRecord[];
@@ -10,7 +10,7 @@ export function ExportCSV({ records, taxYear }: ExportCSVProps) {
   function handleExport() {
     if (records.length === 0) return;
 
-    const headers = ['Date', 'Organization', 'Category', 'Item', 'Qty', 'Unit Value', 'Subtotal', 'Notes'];
+    const headers = ['Date', 'Organization', 'Category', 'Item', 'Condition', 'Qty', 'Unit Value', 'Subtotal', 'Notes'];
     const rows: string[] = [];
 
     let grandTotal = 0;
@@ -23,6 +23,7 @@ export function ExportCSV({ records, taxYear }: ExportCSVProps) {
           `"${record.organization.replace(/"/g, '""')}"`,
           CATEGORY_LABELS[item.category],
           `"${item.itemName.replace(/"/g, '""')}"`,
+          item.condition ? CONDITION_LABELS[item.condition] : 'Good',
           item.quantity,
           item.unitValue.toFixed(2),
           subtotal.toFixed(2),
@@ -31,7 +32,7 @@ export function ExportCSV({ records, taxYear }: ExportCSVProps) {
       }
     }
 
-    rows.push(['', '', '', '', '', 'TOTAL', grandTotal.toFixed(2), ''].join(','));
+    rows.push(['', '', '', '', '', '', 'TOTAL', grandTotal.toFixed(2), ''].join(','));
 
     const csv = [headers.join(','), ...rows].join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });

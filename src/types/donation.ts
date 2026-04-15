@@ -9,6 +9,15 @@ export type DonationCategory =
   | 'vehicle'
   | 'other';
 
+export type ItemCondition = 'high' | 'good' | 'fair' | 'poor';
+
+export const CONDITION_LABELS: Record<ItemCondition, string> = {
+  high: 'High',
+  good: 'Good',
+  fair: 'Fair',
+  poor: 'Poor',
+};
+
 export interface DonationItem {
   id: string;
   category: DonationCategory;
@@ -16,6 +25,7 @@ export interface DonationItem {
   quantity: number;
   unitValue: number;
   description: string;
+  condition?: ItemCondition;
 }
 
 /** One donation trip — items given to one organization on one date */
