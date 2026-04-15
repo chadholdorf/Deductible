@@ -27,6 +27,7 @@ const CATEGORY_ICONS: Partial<Record<DonationCategory, { icon: string; bg: strin
   appliances: { icon: '🔌', bg: 'bg-orange-100 dark:bg-orange-900/40', text: 'text-orange-700 dark:text-orange-300' },
   books_media_toys: { icon: '📚', bg: 'bg-pink-100 dark:bg-pink-900/40', text: 'text-pink-700 dark:text-pink-300' },
   vehicle: { icon: '🚗', bg: 'bg-slate-100 dark:bg-slate-900/40', text: 'text-slate-700 dark:text-slate-300' },
+  mileage: { icon: '🛣️', bg: 'bg-teal-100 dark:bg-teal-900/40', text: 'text-teal-700 dark:text-teal-300' },
   other: { icon: '📦', bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-700 dark:text-gray-300' },
 };
 

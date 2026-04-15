@@ -7,7 +7,11 @@ export type DonationCategory =
   | 'appliances'
   | 'books_media_toys'
   | 'vehicle'
+  | 'mileage'
   | 'other';
+
+/** IRS standard mileage rate for charitable service (per mile) */
+export const CHARITY_MILEAGE_RATE = 0.14;
 
 export type ItemCondition = 'high' | 'good' | 'fair' | 'poor';
 
@@ -58,5 +62,6 @@ export const CATEGORY_LABELS: Record<DonationCategory, string> = {
   appliances: 'Appliances',
   books_media_toys: 'Books, Media & Toys',
   vehicle: 'Vehicle',
+  mileage: 'Volunteer Mileage',
   other: 'Other',
 };

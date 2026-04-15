@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import type { DonationCategory, DonationItem, DonationRecord, ValuationItem, ItemCondition } from '../types/donation';
-import { CATEGORY_LABELS, CONDITION_LABELS } from '../types/donation';
+import { CATEGORY_LABELS, CONDITION_LABELS, CHARITY_MILEAGE_RATE } from '../types/donation';
+import { CharityLookup } from './CharityLookup';
 import valuationGuide from '../data/valuationGuide.json';
 import { findNearbyDonationPlaces } from '../utils/nearbyPlaces';
 import type { NearbyPlace } from '../utils/nearbyPlaces';
@@ -56,6 +57,7 @@ export function DonationBuilder({ editingRecord, onSave, onCancel }: DonationBui
   const [organization, setOrganization] = useState(editingRecord?.organization ?? '');
   const [date, setDate] = useState(editingRecord?.date ?? '');
   const [errors, setErrors] = useState<string[]>([]);
+  const [showCharityLookup, setShowCharityLookup] = useState(false);
 
   // Item form state
   const [form, setForm] = useState({ ...EMPTY_ITEM });
@@ -144,8 +146,19 @@ export function DonationBuilder({ editingRecord, onSave, onCancel }: DonationBui
   }
 
   function handleCategoryChange(cat: DonationCategory) {
-    setForm({ ...EMPTY_ITEM, category: cat });
+    if (cat === 'mileage') {
+      setForm({
+        ...EMPTY_ITEM,
+        category: cat,
+        itemName: 'Volunteer Driving',
+        unitValue: String(CHARITY_MILEAGE_RATE),
+      });
+    } else {
+      setForm({ ...EMPTY_ITEM, category: cat });
+    }
   }
+
+  const isMileage = form.category === 'mileage';
 
   function handleAddItem() {
     if (!form.itemName.trim() || !form.unitValue || Number(form.unitValue) <= 0) return;
@@ -377,7 +390,7 @@ export function DonationBuilder({ editingRecord, onSave, onCancel }: DonationBui
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-irs-600 mb-1">Quantity</label>
+            <label className="block text-xs font-medium text-irs-600 mb-1">{isMileage ? 'Miles' : 'Quantity'}</label>
             <input
               type="number"
               min="1"
@@ -402,8 +415,11 @@ export function DonationBuilder({ editingRecord, onSave, onCancel }: DonationBui
 
           <div>
             <label className="block text-xs font-medium text-irs-600 mb-1">
-              Value per item
-              {form.suggestedRange && (
+              {isMileage ? 'Rate per mile' : 'Value per item'}
+              {isMileage && (
+                <span className="text-irs-400 font-normal ml-1">(IRS rate: ${CHARITY_MILEAGE_RATE}/mile)</span>
+              )}
+              {!isMileage && form.suggestedRange && (
                 <span className="text-irs-400 font-normal ml-1">
                   (guide: ${form.suggestedRange.low}–${form.suggestedRange.high})
                 </span>
@@ -441,7 +457,7 @@ export function DonationBuilder({ editingRecord, onSave, onCancel }: DonationBui
             </div>
             {form.unitValue && form.quantity > 1 && (
               <p className="mt-1 text-xs text-irs-400">
-                Subtotal: {formatCurrency(parseFloat(form.unitValue || '0') * form.quantity)}
+                {isMileage ? `${form.quantity} mi × $${CHARITY_MILEAGE_RATE} = ` : 'Subtotal: '}{formatCurrency(parseFloat(form.unitValue || '0') * form.quantity)}
               </p>
             )}
           </div>
@@ -568,6 +584,17 @@ export function DonationBuilder({ editingRecord, onSave, onCancel }: DonationBui
                     </>
                   )}
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setShowCharityLookup(true)}
+                  className="flex-shrink-0 px-3 py-2.5 border border-irs-300 rounded text-sm text-irs-600 hover:bg-irs-50 active:bg-irs-100 transition-colors flex items-center gap-1.5 whitespace-nowrap min-h-[44px]"
+                  title="Verify 501(c)(3) status"
+                >
+                  <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="hidden sm:inline">501(c)(3)</span>
+                </button>
               </div>
 
               {nearbyStatus === 'error' && nearbyError && (
@@ -638,6 +665,12 @@ export function DonationBuilder({ editingRecord, onSave, onCancel }: DonationBui
           {editingRecord ? 'Cancel' : 'Discard'}
         </button>
       </div>
+
+      <CharityLookup
+        isOpen={showCharityLookup}
+        onClose={() => setShowCharityLookup(false)}
+        onSelect={(name) => setOrganization(name)}
+      />
     </div>
   );
 }
