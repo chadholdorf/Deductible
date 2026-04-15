@@ -12,14 +12,14 @@ function App() {
   const [editingDonation, setEditingDonation] = useState<Donation | null>(null);
   const [showValuation, setShowValuation] = useState(false);
 
-  // Derive available tax years
+  // Derive available tax years — always include the current year
   const taxYears = useMemo(() => {
-    const years = [...new Set(donations.map(d => d.taxYear))];
-    if (years.length === 0) years.push(new Date().getFullYear());
+    const currentYear = new Date().getFullYear();
+    const years = [...new Set([currentYear, ...donations.map(d => d.taxYear)])];
     return years.sort((a, b) => b - a);
   }, [donations]);
 
-  const [selectedYear, setSelectedYear] = useState(() => taxYears[0] ?? new Date().getFullYear());
+  const [selectedYear, setSelectedYear] = useState(() => new Date().getFullYear());
 
   // Filter donations by selected year
   const filteredDonations = useMemo(
