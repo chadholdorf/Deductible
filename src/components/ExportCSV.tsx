@@ -48,7 +48,7 @@ export function ExportCSV({ records, taxYear }: ExportCSVProps) {
     <button
       onClick={handleExport}
       disabled={records.length === 0}
-      className="px-4 py-2.5 border border-irs-300 text-irs-600 rounded hover:bg-irs-50 active:bg-irs-100 transition-colors text-sm disabled:opacity-40 disabled:cursor-not-allowed print:hidden min-h-[44px]"
+      className="px-3 py-2 text-xs border border-irs-200 dark:border-gray-600 text-irs-500 dark:text-gray-400 rounded hover:bg-irs-50 dark:hover:bg-gray-700 active:bg-irs-100 transition-colors disabled:opacity-40 disabled:cursor-not-allowed print:hidden"
     >
       Export CSV
     </button>

@@ -38,5 +38,9 @@ export function useDonations() {
     setRecords(prev => prev.filter(r => r.id !== id));
   }, []);
 
-  return { records, addRecord, updateRecord, deleteRecord };
+  const reloadRecords = useCallback(() => {
+    setRecords(loadRecords());
+  }, []);
+
+  return { records, addRecord, updateRecord, deleteRecord, reloadRecords };
 }

@@ -62,8 +62,8 @@ export function Summary({ records, taxYear }: SummaryProps) {
   return (
     <div className="space-y-4">
       {/* Category Totals */}
-      <div className="bg-white border border-irs-200 rounded-lg p-5">
-        <h2 className="text-base font-semibold text-irs-800 mb-4 border-b border-irs-100 pb-2">
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5">
+        <h2 className="text-base font-semibold text-irs-800 dark:text-gray-100 mb-4 border-b border-irs-100 dark:border-gray-700 pb-2">
           {taxYear} Summary
         </h2>
 
@@ -83,7 +83,7 @@ export function Summary({ records, taxYear }: SummaryProps) {
                       {CATEGORY_LABELS[cat as DonationCategory]}
                       <span className="text-irs-400 ml-1 text-xs">({itemCount})</span>
                     </span>
-                    <span className="font-mono font-medium text-irs-800">
+                    <span className="font-mono font-medium text-irs-800 dark:text-gray-100">
                       {formatCurrency(total ?? 0)}
                     </span>
                   </div>
@@ -93,7 +93,7 @@ export function Summary({ records, taxYear }: SummaryProps) {
 
             {/* Cash vs Non-cash split */}
             {cashTotal > 0 && nonCashTotal > 0 && (
-              <div className="mb-3 pt-2 border-t border-irs-100 space-y-1">
+              <div className="mb-3 pt-2 border-t border-irs-100 dark:border-gray-700 space-y-1">
                 <div className="flex justify-between text-xs text-irs-500">
                   <span>Cash donations</span>
                   <span className="font-mono">{formatCurrency(cashTotal)}</span>
@@ -106,8 +106,8 @@ export function Summary({ records, taxYear }: SummaryProps) {
             )}
 
             <div className="border-t-2 border-irs-700 pt-3 flex justify-between items-center">
-              <span className="font-semibold text-irs-800 text-sm">Total Deduction</span>
-              <span className="font-mono font-bold text-xl text-irs-900">{formatCurrency(grandTotal)}</span>
+              <span className="font-semibold text-irs-800 dark:text-gray-100 text-sm">Total Deduction</span>
+              <span className="font-mono font-bold text-xl text-irs-900 dark:text-white">{formatCurrency(grandTotal)}</span>
             </div>
             <p className="mt-2 text-xs text-irs-400">
               {records.length} donation{records.length !== 1 ? 's' : ''} to{' '}
@@ -119,8 +119,8 @@ export function Summary({ records, taxYear }: SummaryProps) {
 
       {/* Tax Insights */}
       {grandTotal > 0 && (
-        <div className="bg-white border border-irs-200 rounded-lg p-5">
-          <h3 className="text-sm font-semibold text-irs-800 mb-3 border-b border-irs-100 pb-2">
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5">
+          <h3 className="text-sm font-semibold text-irs-800 dark:text-gray-100 mb-3 border-b border-irs-100 dark:border-gray-700 pb-2">
             Tax Insights
           </h3>
 
@@ -131,7 +131,7 @@ export function Summary({ records, taxYear }: SummaryProps) {
               <select
                 value={bracketRate}
                 onChange={e => setBracketRate(Number(e.target.value))}
-                className="border border-irs-200 rounded px-2 py-1.5 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-irs-400 min-h-[36px]"
+                className="border border-irs-200 dark:border-gray-600 rounded px-2 py-1.5 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-irs-400 min-h-[36px]"
               >
                 {TAX_BRACKETS.map(b => (
                   <option key={b.rate} value={b.rate}>{b.label}</option>
@@ -150,11 +150,11 @@ export function Summary({ records, taxYear }: SummaryProps) {
           </div>
 
           {/* Standard deduction comparison */}
-          <div className="mb-4 p-3 bg-irs-50 rounded-lg">
+          <div className="mb-4 p-3 bg-irs-50 dark:bg-gray-900/50 rounded-lg">
             <div className="text-xs font-medium text-irs-700 mb-2">Itemizing vs. Standard Deduction</div>
             <div className="text-xs text-irs-600 space-y-2">
               <p>Charitable donations only reduce your taxes if you <strong>itemize</strong> deductions instead of taking the standard deduction.</p>
-              <div className="bg-white rounded border border-irs-200 p-2">
+              <div className="bg-white dark:bg-gray-800 rounded border border-irs-200 dark:border-gray-600 p-2">
                 <div className="flex justify-between py-0.5">
                   <span className="text-irs-500">Single filer</span>
                   <span className="font-mono font-medium">~{formatCurrency(STANDARD_DEDUCTION.single)}</span>
@@ -213,7 +213,7 @@ export function Summary({ records, taxYear }: SummaryProps) {
             )}
 
             {nonCashTotal > 0 && !needsForm8283 && (
-              <div className="flex gap-2 p-2.5 bg-irs-50 border border-irs-200 rounded-lg">
+              <div className="flex gap-2 p-2.5 bg-irs-50 border border-irs-200 dark:border-gray-600 rounded-lg">
                 <svg className="w-4 h-4 text-irs-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>

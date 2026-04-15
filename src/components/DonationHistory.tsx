@@ -31,9 +31,9 @@ export function DonationHistory({ records, onEdit, onDelete }: DonationHistoryPr
 
   if (records.length === 0) {
     return (
-      <div className="bg-white border border-irs-200 rounded-lg p-10 text-center text-irs-400">
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-10 text-center text-gray-400 dark:text-gray-500">
         <p className="text-base">No donations recorded for this tax year.</p>
-        <p className="text-sm mt-1">Click "Start New Donation List" above to add your first donation.</p>
+        <p className="text-sm mt-1">Tap "New Donation" to add your first.</p>
       </div>
     );
   }
@@ -46,83 +46,60 @@ export function DonationHistory({ records, onEdit, onDelete }: DonationHistoryPr
         const total = recordTotal(record);
         const expanded = expandedIds.has(record.id);
         return (
-          <div key={record.id} className="bg-white border border-irs-200 rounded-lg overflow-hidden">
-            {/* Main row — tap to expand */}
+          <div key={record.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
             <button
               type="button"
               onClick={() => toggleExpand(record.id)}
-              className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-irs-50/60 active:bg-irs-50 transition-colors min-h-[52px]"
+              className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-750 active:bg-gray-100 dark:active:bg-gray-700 transition-colors min-h-[52px]"
             >
               <svg
-                className={`w-4 h-4 flex-shrink-0 text-irs-400 transition-transform ${expanded ? 'rotate-90' : ''}`}
+                className={`w-4 h-4 flex-shrink-0 text-gray-400 dark:text-gray-500 transition-transform ${expanded ? 'rotate-90' : ''}`}
                 fill="none" stroke="currentColor" viewBox="0 0 24 24"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
-
               <div className="flex-1 min-w-0">
                 <div className="flex items-baseline gap-2 flex-wrap">
-                  <span className="font-medium text-sm text-irs-800 truncate">{record.organization}</span>
-                  <span className="text-xs text-irs-400 whitespace-nowrap">
+                  <span className="font-medium text-sm text-gray-800 dark:text-gray-100 truncate">{record.organization}</span>
+                  <span className="text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap">
                     {record.items.length} item{record.items.length !== 1 ? 's' : ''}
                   </span>
                 </div>
-                <div className="text-xs text-irs-500 font-mono mt-0.5">{formatDate(record.date)}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 font-mono mt-0.5">{formatDate(record.date)}</div>
               </div>
-
-              <span className="flex-shrink-0 font-mono font-semibold text-sm text-irs-800">
+              <span className="flex-shrink-0 font-mono font-semibold text-sm text-gray-800 dark:text-gray-100">
                 {formatCurrency(total)}
               </span>
             </button>
 
-            {/* Expanded details */}
             {expanded && (
-              <div className="border-t border-irs-100">
-                {/* Item list */}
-                <div className="px-4 py-3 space-y-2 bg-irs-50/40">
+              <div className="border-t border-gray-100 dark:border-gray-700">
+                <div className="px-4 py-3 space-y-2 bg-gray-50/60 dark:bg-gray-900/40">
                   {record.items.map(item => (
                     <div key={item.id} className="flex items-start gap-2 text-sm">
-                      <span className="flex-shrink-0 px-1.5 py-0.5 bg-irs-100 text-irs-600 rounded text-xs mt-0.5">
+                      <span className="flex-shrink-0 px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded text-xs mt-0.5">
                         {CATEGORY_LABELS[item.category]}
                       </span>
-                      <span className="flex-1 min-w-0 text-xs text-irs-700">
-                        {item.quantity > 1 && (
-                          <span className="text-irs-400 mr-1">{item.quantity}×</span>
-                        )}
+                      <span className="flex-1 min-w-0 text-xs text-gray-700 dark:text-gray-300">
+                        {item.quantity > 1 && <span className="text-gray-400 mr-1">{item.quantity}×</span>}
                         {item.itemName}
-                        {item.condition && (
-                          <span className="text-irs-400 ml-1">[{CONDITION_LABELS[item.condition]}]</span>
-                        )}
-                        {item.description && (
-                          <span className="text-irs-400 ml-1">— {item.description}</span>
-                        )}
-                        {item.quantity > 1 && (
-                          <span className="text-irs-400 ml-1">({formatCurrency(item.unitValue)} ea.)</span>
-                        )}
+                        {item.condition && <span className="text-gray-400 ml-1">[{CONDITION_LABELS[item.condition]}]</span>}
+                        {item.description && <span className="text-gray-400 ml-1">— {item.description}</span>}
+                        {item.quantity > 1 && <span className="text-gray-400 ml-1">({formatCurrency(item.unitValue)} ea.)</span>}
                       </span>
-                      <span className="flex-shrink-0 font-mono text-xs text-irs-600">
+                      <span className="flex-shrink-0 font-mono text-xs text-gray-600 dark:text-gray-400">
                         {formatCurrency(item.quantity * item.unitValue)}
                       </span>
                     </div>
                   ))}
                 </div>
-
-                {/* Actions */}
-                <div className="px-4 py-3 border-t border-irs-100 flex gap-3 print:hidden">
-                  <button
-                    onClick={() => onEdit(record)}
-                    className="px-4 py-2 text-sm text-irs-600 border border-irs-200 rounded hover:bg-irs-50 active:bg-irs-100 transition-colors min-h-[44px]"
-                  >
+                <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-700 flex gap-3 print:hidden">
+                  <button onClick={() => onEdit(record)}
+                    className="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 transition-colors min-h-[44px]">
                     Edit
                   </button>
-                  <button
-                    onClick={() => {
-                      if (window.confirm(`Delete donation to "${record.organization}" on ${formatDate(record.date)}?`)) {
-                        onDelete(record.id);
-                      }
-                    }}
-                    className="px-4 py-2 text-sm text-red-500 border border-red-200 rounded hover:bg-red-50 active:bg-red-100 transition-colors min-h-[44px]"
-                  >
+                  <button onClick={() => { if (window.confirm(`Delete donation to "${record.organization}"?`)) onDelete(record.id); }}
+                    className="px-4 py-2 text-sm text-red-500 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 active:bg-red-100 transition-colors min-h-[44px]">
                     Delete
                   </button>
                 </div>
