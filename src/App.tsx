@@ -1,71 +1,87 @@
 import { useState, useMemo } from 'react';
 import { useDonations } from './hooks/useDonations';
-import { DonationForm } from './components/DonationForm';
-import { DonationTable } from './components/DonationTable';
+import { DonationBuilder } from './components/DonationBuilder';
+import { DonationHistory } from './components/DonationHistory';
 import { Summary } from './components/Summary';
 import { ValuationModal } from './components/ValuationModal';
 import { ExportCSV } from './components/ExportCSV';
-import type { Donation } from './types/donation';
+import type { DonationRecord } from './types/donation';
+import { recordTotal } from './types/donation';
+
+type Mode = 'view' | 'building' | 'editing';
+
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+}
 
 function App() {
-  const { donations, addDonation, updateDonation, deleteDonation } = useDonations();
-  const [editingDonation, setEditingDonation] = useState<Donation | null>(null);
+  const { records, addRecord, updateRecord, deleteRecord } = useDonations();
+  const [mode, setMode] = useState<Mode>('view');
+  const [editingRecord, setEditingRecord] = useState<DonationRecord | null>(null);
   const [showValuation, setShowValuation] = useState(false);
 
-  // Derive available tax years — always include the current year
+  // Available tax years — always include current year
   const taxYears = useMemo(() => {
     const currentYear = new Date().getFullYear();
-    const years = [...new Set([currentYear, ...donations.map(d => d.taxYear)])];
+    const years = [...new Set([currentYear, ...records.map(r => r.taxYear)])];
     return years.sort((a, b) => b - a);
-  }, [donations]);
+  }, [records]);
 
   const [selectedYear, setSelectedYear] = useState(() => new Date().getFullYear());
 
-  // Filter donations by selected year
-  const filteredDonations = useMemo(
-    () =>
-      donations
-        .filter(d => d.taxYear === selectedYear)
-        .sort((a, b) => b.date.localeCompare(a.date)),
-    [donations, selectedYear]
+  const yearRecords = useMemo(
+    () => records.filter(r => r.taxYear === selectedYear),
+    [records, selectedYear]
   );
 
-  function handleSubmit(donation: Omit<Donation, 'id'>) {
-    if (editingDonation) {
-      updateDonation(editingDonation.id, donation);
-      setEditingDonation(null);
+  const yearTotal = useMemo(
+    () => yearRecords.reduce((sum, r) => sum + recordTotal(r), 0),
+    [yearRecords]
+  );
+
+  function handleSave(data: Omit<DonationRecord, 'id'>) {
+    if (editingRecord) {
+      updateRecord(editingRecord.id, data);
+      setEditingRecord(null);
     } else {
-      addDonation(donation);
-      // Switch to the year of the new donation
-      if (donation.taxYear !== selectedYear) {
-        setSelectedYear(donation.taxYear);
-      }
+      addRecord(data);
+      if (data.taxYear !== selectedYear) setSelectedYear(data.taxYear);
     }
+    setMode('view');
+  }
+
+  function handleEdit(record: DonationRecord) {
+    setEditingRecord(record);
+    setMode('editing');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function handleCancel() {
+    setEditingRecord(null);
+    setMode('view');
   }
 
   return (
     <div className="min-h-screen bg-irs-50">
       {/* Header */}
       <header className="bg-irs-900 text-white print:bg-white print:text-black">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="max-w-5xl mx-auto px-4 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h1 className="text-xl font-bold tracking-tight">
-              It&rsquo;s Deductible
-            </h1>
-            <p className="text-irs-300 text-sm print:text-gray-500">
-              Charitable Donation Tracker for Tax Preparation
+            <h1 className="text-xl font-bold tracking-tight">It&rsquo;s Deductible</h1>
+            <p className="text-irs-300 text-xs mt-0.5 print:text-gray-500">
+              Charitable Donation Tracker
             </p>
           </div>
-          <div className="flex items-center gap-3 print:hidden">
+          <div className="flex items-center gap-2 print:hidden">
             <button
               onClick={() => setShowValuation(true)}
-              className="px-4 py-2 bg-irs-700 hover:bg-irs-600 text-white rounded text-sm transition-colors border border-irs-600"
+              className="px-3 py-2 bg-irs-700 hover:bg-irs-600 text-white rounded text-sm transition-colors border border-irs-600"
             >
               Value Reference
             </button>
             <button
               onClick={() => window.print()}
-              className="px-4 py-2 border border-irs-600 text-irs-200 hover:bg-irs-800 rounded text-sm transition-colors"
+              className="px-3 py-2 border border-irs-600 text-irs-200 hover:bg-irs-800 rounded text-sm transition-colors"
             >
               Print
             </button>
@@ -73,44 +89,62 @@ function App() {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
-        {/* Donation Form */}
-        <DonationForm
-          onSubmit={handleSubmit}
-          editingDonation={editingDonation}
-          onCancelEdit={() => setEditingDonation(null)}
-        />
+      <main className="max-w-5xl mx-auto px-4 py-6 space-y-6">
 
-        {/* Year filter + actions bar */}
+        {/* ── Step 1: Start or Builder ── */}
+        {mode === 'view' ? (
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setMode('building')}
+              className="flex items-center gap-2 px-5 py-3 bg-irs-700 text-white rounded-lg hover:bg-irs-800 transition-colors text-sm font-semibold shadow-sm"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Start New Donation List
+            </button>
+            {yearRecords.length > 0 && (
+              <p className="text-sm text-irs-500">
+                {yearRecords.length} donation{yearRecords.length !== 1 ? 's' : ''} in {selectedYear} &mdash; {formatCurrency(yearTotal)} total
+              </p>
+            )}
+          </div>
+        ) : (
+          <DonationBuilder
+            editingRecord={editingRecord}
+            onSave={handleSave}
+            onCancel={handleCancel}
+          />
+        )}
+
+        {/* ── Year filter + export ── */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="flex items-center gap-3">
-            <label className="text-sm font-medium text-irs-700">Tax Year:</label>
+            <span className="text-sm font-medium text-irs-700 print:hidden">Tax Year:</span>
             <select
               value={selectedYear}
               onChange={e => setSelectedYear(Number(e.target.value))}
-              className="border border-irs-200 rounded px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-irs-400 print:hidden"
+              className="border border-irs-200 rounded px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-irs-400 print:hidden"
             >
               {taxYears.map(y => (
                 <option key={y} value={y}>{y}</option>
               ))}
             </select>
-            <span className="text-irs-400 text-sm hidden print:inline">
-              {selectedYear}
-            </span>
+            <span className="hidden print:inline text-sm font-semibold text-irs-800">Tax Year {selectedYear}</span>
           </div>
-          <ExportCSV donations={filteredDonations} taxYear={selectedYear} />
+          <ExportCSV records={yearRecords} taxYear={selectedYear} />
         </div>
 
-        {/* Summary + Table */}
+        {/* ── Summary + History ── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1">
-            <Summary donations={filteredDonations} taxYear={selectedYear} />
+            <Summary records={yearRecords} taxYear={selectedYear} />
           </div>
           <div className="lg:col-span-2">
-            <DonationTable
-              donations={filteredDonations}
-              onEdit={setEditingDonation}
-              onDelete={deleteDonation}
+            <DonationHistory
+              records={yearRecords}
+              onEdit={handleEdit}
+              onDelete={deleteRecord}
             />
           </div>
         </div>
@@ -118,20 +152,11 @@ function App() {
 
       {/* Footer */}
       <footer className="border-t border-irs-200 mt-12 py-6 text-center text-xs text-irs-400 print:hidden">
-        <p>
-          It&rsquo;s Deductible &mdash; Open-source donation tracker.
-          All data stored locally in your browser.
-        </p>
-        <p className="mt-1">
-          Not tax advice. Consult a qualified tax professional for guidance.
-        </p>
+        <p>It&rsquo;s Deductible &mdash; Open-source donation tracker. All data stored locally in your browser.</p>
+        <p className="mt-1">Not tax advice. Consult a qualified tax professional.</p>
       </footer>
 
-      {/* Valuation Modal */}
-      <ValuationModal
-        isOpen={showValuation}
-        onClose={() => setShowValuation(false)}
-      />
+      <ValuationModal isOpen={showValuation} onClose={() => setShowValuation(false)} />
     </div>
   );
 }

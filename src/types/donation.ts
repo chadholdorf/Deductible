@@ -9,14 +9,26 @@ export type DonationCategory =
   | 'vehicle'
   | 'other';
 
-export interface Donation {
+export interface DonationItem {
+  id: string;
+  category: DonationCategory;
+  itemName: string;
+  quantity: number;
+  unitValue: number;
+  description: string;
+}
+
+/** One donation trip — items given to one organization on one date */
+export interface DonationRecord {
   id: string;
   organization: string;
-  date: string; // ISO date string YYYY-MM-DD
-  category: DonationCategory;
-  estimatedValue: number;
-  description: string;
+  date: string; // YYYY-MM-DD
   taxYear: number;
+  items: DonationItem[];
+}
+
+export function recordTotal(record: DonationRecord): number {
+  return record.items.reduce((sum, item) => sum + item.quantity * item.unitValue, 0);
 }
 
 export interface ValuationItem {

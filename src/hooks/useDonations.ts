@@ -1,51 +1,42 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { Donation } from '../types/donation';
-import { SAMPLE_DONATIONS } from '../data/sampleData';
+import type { DonationRecord } from '../types/donation';
+import { SAMPLE_RECORDS } from '../data/sampleData';
 
-const STORAGE_KEY = 'its-deductible-donations';
+const STORAGE_KEY = 'its-deductible-records-v2';
 
-function loadDonations(): Donation[] {
+function loadRecords(): DonationRecord[] {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      return JSON.parse(stored);
-    }
+    if (stored) return JSON.parse(stored);
   } catch {
-    // Corrupted data — fall through to defaults
+    // Corrupted — fall through to defaults
   }
-  // First load: seed with sample data
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(SAMPLE_DONATIONS));
-  return SAMPLE_DONATIONS;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(SAMPLE_RECORDS));
+  return SAMPLE_RECORDS;
 }
 
-function saveDonations(donations: Donation[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(donations));
+function saveRecords(records: DonationRecord[]) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
 }
 
 export function useDonations() {
-  const [donations, setDonations] = useState<Donation[]>(loadDonations);
+  const [records, setRecords] = useState<DonationRecord[]>(loadRecords);
 
   useEffect(() => {
-    saveDonations(donations);
-  }, [donations]);
+    saveRecords(records);
+  }, [records]);
 
-  const addDonation = useCallback((donation: Omit<Donation, 'id'>) => {
-    const newDonation: Donation = {
-      ...donation,
-      id: crypto.randomUUID(),
-    };
-    setDonations(prev => [newDonation, ...prev]);
+  const addRecord = useCallback((record: Omit<DonationRecord, 'id'>) => {
+    setRecords(prev => [{ ...record, id: crypto.randomUUID() }, ...prev]);
   }, []);
 
-  const updateDonation = useCallback((id: string, updates: Partial<Omit<Donation, 'id'>>) => {
-    setDonations(prev =>
-      prev.map(d => (d.id === id ? { ...d, ...updates } : d))
-    );
+  const updateRecord = useCallback((id: string, updates: Omit<DonationRecord, 'id'>) => {
+    setRecords(prev => prev.map(r => (r.id === id ? { ...updates, id } : r)));
   }, []);
 
-  const deleteDonation = useCallback((id: string) => {
-    setDonations(prev => prev.filter(d => d.id !== id));
+  const deleteRecord = useCallback((id: string) => {
+    setRecords(prev => prev.filter(r => r.id !== id));
   }, []);
 
-  return { donations, addDonation, updateDonation, deleteDonation };
+  return { records, addRecord, updateRecord, deleteRecord };
 }
