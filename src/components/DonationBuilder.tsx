@@ -117,15 +117,17 @@ export function DonationBuilder({ editingRecord, startCategory, onSave, onCancel
 
   function handleSearchSelect(guideItem: ValuationItem) {
     const donationCat = GUIDE_TO_DONATION_CATEGORY[guideItem.category] ?? 'other';
+    const range = { low: guideItem.low, high: guideItem.high };
+    const condition: ItemCondition = 'good';
     setForm({
       category: donationCat,
       itemName: guideItem.item,
       quantity: 1,
-      unitValue: String(Math.round((guideItem.low + guideItem.high) / 2)),
+      unitValue: conditionToValue(condition, range),
       description: '',
-      condition: 'good' as ItemCondition,
+      condition,
       selectedPreset: guideItem.item,
-      suggestedRange: { low: guideItem.low, high: guideItem.high },
+      suggestedRange: range,
     });
     setSearchQuery('');
     setShowSearchResults(false);
@@ -143,15 +145,18 @@ export function DonationBuilder({ editingRecord, startCategory, onSave, onCancel
     const match = guide.find(
       g => g.item === presetName && VALUATION_CATEGORY_MAP[form.category]?.includes(g.category)
     );
-    setForm(f => ({
-      ...f,
-      selectedPreset: presetName,
-      itemName: presetName || f.itemName,
-      suggestedRange: match ? { low: match.low, high: match.high } : null,
-      unitValue: match && !f.unitValue
-        ? String(Math.round((match.low + match.high) / 2))
-        : f.unitValue,
-    }));
+    setForm(f => {
+      const range = match ? { low: match.low, high: match.high } : null;
+      return {
+        ...f,
+        selectedPreset: presetName,
+        itemName: presetName || f.itemName,
+        suggestedRange: range,
+        unitValue: match
+          ? conditionToValue(f.condition, { low: match.low, high: match.high })
+          : f.unitValue,
+      };
+    });
   }
 
   function handleCategoryChange(cat: DonationCategory) {
@@ -165,6 +170,23 @@ export function DonationBuilder({ editingRecord, startCategory, onSave, onCancel
     } else {
       setForm({ ...EMPTY_ITEM, category: cat });
     }
+  }
+
+  function conditionToValue(condition: ItemCondition, range: { low: number; high: number }): string {
+    switch (condition) {
+      case 'high': return String(range.high);
+      case 'good': return String(Math.round((range.low + range.high) / 2));
+      case 'fair': return String(range.low);
+      case 'poor': return String(Math.round(range.low * 0.5));
+    }
+  }
+
+  function handleConditionChange(condition: ItemCondition) {
+    setForm(f => ({
+      ...f,
+      condition,
+      unitValue: f.suggestedRange ? conditionToValue(condition, f.suggestedRange) : f.unitValue,
+    }));
   }
 
   const isMileage = form.category === 'mileage';
@@ -413,7 +435,7 @@ export function DonationBuilder({ editingRecord, startCategory, onSave, onCancel
             <label className="block text-xs font-medium text-irs-600 mb-1">Condition</label>
             <select
               value={form.condition}
-              onChange={e => setForm(f => ({ ...f, condition: e.target.value as ItemCondition }))}
+              onChange={e => handleConditionChange(e.target.value as ItemCondition)}
               className="w-full border border-irs-200 rounded px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-irs-400"
             >
               {Object.entries(CONDITION_LABELS).map(([key, label]) => (
