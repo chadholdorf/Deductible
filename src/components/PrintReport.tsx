@@ -74,11 +74,14 @@ export function PrintReport({ records, taxYear, onClose }: PrintReportProps) {
     <div className="fixed inset-0 z-50 bg-white overflow-y-auto print:static">
       {/* Toolbar */}
       <div className="print:hidden sticky top-0 bg-irs-900 text-white px-4 py-3 flex items-center justify-between shadow-md z-10">
-        <span className="text-sm font-medium">Report Preview — {taxYear}</span>
+        <span className="text-sm font-medium">{taxYear} YTD Charitable Deductions</span>
         <div className="flex gap-2">
           <button onClick={handlePrint}
-            className="px-4 py-2 bg-white text-irs-900 rounded text-sm font-medium hover:bg-irs-100 min-h-[44px]">
-            Print / Save PDF
+            className="px-4 py-2 bg-white text-irs-900 rounded text-sm font-medium hover:bg-irs-100 min-h-[44px] flex items-center gap-1.5">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Save as PDF
           </button>
           <button onClick={onClose}
             className="px-4 py-2 border border-irs-600 text-irs-200 rounded text-sm hover:bg-irs-800 min-h-[44px]">

@@ -85,7 +85,7 @@ function App() {
               onClick={() => setShowReport(true)}
               className="px-4 py-2.5 border border-irs-600 text-irs-200 hover:bg-irs-800 active:bg-irs-700 rounded text-sm transition-colors min-h-[44px]"
             >
-              Print Report
+              Export PDF
             </button>
           </div>
         </div>
