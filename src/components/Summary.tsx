@@ -151,14 +151,35 @@ export function Summary({ records, taxYear }: SummaryProps) {
 
           {/* Standard deduction comparison */}
           <div className="mb-4 p-3 bg-irs-50 rounded-lg">
-            <div className="text-xs font-medium text-irs-700 mb-1.5">Itemizing vs. Standard Deduction</div>
-            <p className="text-xs text-irs-500 leading-relaxed">
-              Your charitable donations count only if you <strong>itemize</strong> deductions.
-              The {taxYear} standard deduction is ~{formatCurrency(STANDARD_DEDUCTION.single)} (single)
-              or ~{formatCurrency(STANDARD_DEDUCTION.married)} (married filing jointly).
-              You need total itemized deductions (including mortgage interest, state taxes, etc.)
-              to exceed the standard deduction for these to save you money.
-            </p>
+            <div className="text-xs font-medium text-irs-700 mb-2">Itemizing vs. Standard Deduction</div>
+            <div className="text-xs text-irs-600 space-y-2">
+              <p>Charitable donations only reduce your taxes if you <strong>itemize</strong> deductions instead of taking the standard deduction.</p>
+              <div className="bg-white rounded border border-irs-200 p-2">
+                <div className="flex justify-between py-0.5">
+                  <span className="text-irs-500">Single filer</span>
+                  <span className="font-mono font-medium">~{formatCurrency(STANDARD_DEDUCTION.single)}</span>
+                </div>
+                <div className="flex justify-between py-0.5">
+                  <span className="text-irs-500">Married filing jointly</span>
+                  <span className="font-mono font-medium">~{formatCurrency(STANDARD_DEDUCTION.married)}</span>
+                </div>
+              </div>
+              <p className="text-irs-500">
+                Your total itemized deductions (donations + mortgage interest + state/local taxes + medical expenses)
+                need to exceed the standard deduction for itemizing to be worthwhile.
+              </p>
+              <a
+                href="https://www.irs.gov/taxtopics/tc501"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline font-medium"
+              >
+                Learn more at IRS.gov
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+            </div>
           </div>
 
           {/* IRS thresholds & warnings */}
