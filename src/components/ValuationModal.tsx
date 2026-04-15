@@ -37,8 +37,8 @@ export function ValuationModal({ isOpen, onClose }: ValuationModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-8 md:pt-16 px-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[80vh] flex flex-col">
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-start sm:justify-center sm:pt-12 md:pt-16">
+      <div className="bg-white rounded-t-xl sm:rounded-lg shadow-xl w-full sm:max-w-3xl sm:mx-4 h-[90vh] sm:h-auto sm:max-h-[80vh] flex flex-col">
         {/* Header */}
         <div className="p-4 border-b border-irs-200 flex-shrink-0">
           <div className="flex justify-between items-center mb-3">
@@ -47,7 +47,7 @@ export function ValuationModal({ isOpen, onClose }: ValuationModalProps) {
             </h2>
             <button
               onClick={onClose}
-              className="text-irs-400 hover:text-irs-700 transition-colors text-2xl leading-none"
+              className="flex items-center justify-center w-10 h-10 rounded-full text-irs-400 hover:text-irs-700 hover:bg-irs-100 active:bg-irs-200 transition-colors text-2xl leading-none"
               aria-label="Close"
             >
               &times;
@@ -62,13 +62,13 @@ export function ValuationModal({ isOpen, onClose }: ValuationModalProps) {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search items..."
-              className="flex-1 border border-irs-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-irs-400"
+              className="flex-1 border border-irs-200 rounded px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-irs-400 min-h-[44px]"
               autoFocus
             />
             <select
               value={filterCategory}
               onChange={e => setFilterCategory(e.target.value)}
-              className="border border-irs-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-irs-400 bg-white"
+              className="border border-irs-200 rounded px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-irs-400 bg-white min-h-[44px]"
             >
               <option value="">All Categories</option>
               {categories.map(c => (
@@ -83,11 +83,11 @@ export function ValuationModal({ isOpen, onClose }: ValuationModalProps) {
           <table className="w-full text-sm">
             <thead className="sticky top-0 bg-irs-50">
               <tr className="border-b border-irs-200">
-                <th className="text-left px-4 py-2 font-semibold text-irs-700">Category</th>
-                <th className="text-left px-4 py-2 font-semibold text-irs-700">Item</th>
-                <th className="text-right px-4 py-2 font-semibold text-irs-700">Low</th>
-                <th className="text-right px-4 py-2 font-semibold text-irs-700">High</th>
-                <th className="text-center px-4 py-2 font-semibold text-irs-700">Unit</th>
+                <th className="text-left px-3 sm:px-4 py-2 font-semibold text-irs-700 hidden sm:table-cell">Category</th>
+                <th className="text-left px-3 sm:px-4 py-2 font-semibold text-irs-700">Item</th>
+                <th className="text-right px-3 sm:px-4 py-2 font-semibold text-irs-700">Low</th>
+                <th className="text-right px-3 sm:px-4 py-2 font-semibold text-irs-700">High</th>
+                <th className="text-center px-3 sm:px-4 py-2 font-semibold text-irs-700 hidden sm:table-cell">Unit</th>
               </tr>
             </thead>
             <tbody>
@@ -103,11 +103,11 @@ export function ValuationModal({ isOpen, onClose }: ValuationModalProps) {
                     key={`${item.category}-${item.item}-${i}`}
                     className={`border-b border-irs-100 ${i % 2 === 1 ? 'bg-gray-50/50' : ''}`}
                   >
-                    <td className="px-4 py-2 text-irs-500 text-xs">{item.category}</td>
-                    <td className="px-4 py-2 text-irs-800">{item.item}</td>
-                    <td className="px-4 py-2 text-right font-mono text-irs-600">${item.low}</td>
-                    <td className="px-4 py-2 text-right font-mono text-irs-600">${item.high}</td>
-                    <td className="px-4 py-2 text-center text-irs-400 text-xs">{item.unit}</td>
+                    <td className="px-3 sm:px-4 py-2.5 text-irs-500 text-xs hidden sm:table-cell">{item.category}</td>
+                    <td className="px-3 sm:px-4 py-2.5 text-irs-800">{item.item}</td>
+                    <td className="px-3 sm:px-4 py-2.5 text-right font-mono text-irs-600">${item.low}</td>
+                    <td className="px-3 sm:px-4 py-2.5 text-right font-mono text-irs-600">${item.high}</td>
+                    <td className="px-3 sm:px-4 py-2.5 text-center text-irs-400 text-xs hidden sm:table-cell">{item.unit}</td>
                   </tr>
                 ))
               )}

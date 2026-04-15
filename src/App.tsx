@@ -75,13 +75,13 @@ function App() {
           <div className="flex items-center gap-2 print:hidden">
             <button
               onClick={() => setShowValuation(true)}
-              className="px-3 py-2 bg-irs-700 hover:bg-irs-600 text-white rounded text-sm transition-colors border border-irs-600"
+              className="px-4 py-2.5 bg-irs-700 hover:bg-irs-600 active:bg-irs-500 text-white rounded text-sm transition-colors border border-irs-600 min-h-[44px]"
             >
               Value Reference
             </button>
             <button
               onClick={() => window.print()}
-              className="px-3 py-2 border border-irs-600 text-irs-200 hover:bg-irs-800 rounded text-sm transition-colors"
+              className="px-4 py-2.5 border border-irs-600 text-irs-200 hover:bg-irs-800 active:bg-irs-700 rounded text-sm transition-colors min-h-[44px]"
             >
               Print
             </button>
@@ -93,10 +93,10 @@ function App() {
 
         {/* ── Step 1: Start or Builder ── */}
         {mode === 'view' ? (
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
             <button
               onClick={() => setMode('building')}
-              className="flex items-center gap-2 px-5 py-3 bg-irs-700 text-white rounded-lg hover:bg-irs-800 transition-colors text-sm font-semibold shadow-sm"
+              className="flex items-center justify-center sm:justify-start gap-2 px-5 py-3.5 bg-irs-700 text-white rounded-lg hover:bg-irs-800 active:bg-irs-900 transition-colors text-sm font-semibold shadow-sm min-h-[48px]"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -136,11 +136,11 @@ function App() {
         </div>
 
         {/* ── Summary + History ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-1">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="md:col-span-1">
             <Summary records={yearRecords} taxYear={selectedYear} />
           </div>
-          <div className="lg:col-span-2">
+          <div className="md:col-span-2">
             <DonationHistory
               records={yearRecords}
               onEdit={handleEdit}

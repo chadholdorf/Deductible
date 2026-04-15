@@ -268,8 +268,8 @@ export function DonationBuilder({ editingRecord, onSave, onCancel }: DonationBui
                 setShowSearchResults(true);
               }}
               onFocus={() => { if (searchQuery) setShowSearchResults(true); }}
-              className="w-full border border-irs-200 rounded pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-irs-400"
-              placeholder='e.g. "jeans", "sofa", "laptop", "dress shirt"...'
+              className="w-full border border-irs-200 rounded pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-irs-400"
+              placeholder='Search: jeans, sofa, laptop...'
               autoComplete="off"
             />
             {searchQuery && (
@@ -290,13 +290,13 @@ export function DonationBuilder({ editingRecord, onSave, onCancel }: DonationBui
                 <div className="px-3 py-2 border-b border-irs-100 text-xs text-irs-400 font-medium bg-irs-50">
                   {searchResults.length} match{searchResults.length !== 1 ? 'es' : ''} — click to fill form
                 </div>
-                <div className="max-h-64 overflow-y-auto">
+                <div className="max-h-[50vh] overflow-y-auto">
                   {searchResults.map((item, i) => (
                     <button
                       key={`${item.category}-${item.item}-${i}`}
                       type="button"
                       onClick={() => handleSearchSelect(item)}
-                      className="w-full text-left px-3 py-2.5 hover:bg-irs-50 transition-colors border-b border-irs-50 last:border-0 flex items-center gap-3"
+                      className="w-full text-left px-3 py-3 hover:bg-irs-50 active:bg-irs-100 transition-colors border-b border-irs-50 last:border-0 flex items-center gap-3 min-h-[44px]"
                     >
                       <span className="flex-shrink-0 px-1.5 py-0.5 bg-irs-100 text-irs-600 rounded text-xs whitespace-nowrap">
                         {item.category}
@@ -368,7 +368,7 @@ export function DonationBuilder({ editingRecord, onSave, onCancel }: DonationBui
               type="text"
               value={form.itemName}
               onChange={e => setForm(f => ({ ...f, itemName: e.target.value }))}
-              className="w-full border border-irs-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-irs-400"
+              className="w-full border border-irs-200 rounded px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-irs-400"
               placeholder={form.selectedPreset || 'Describe the item'}
             />
           </div>
@@ -380,7 +380,7 @@ export function DonationBuilder({ editingRecord, onSave, onCancel }: DonationBui
               min="1"
               value={form.quantity}
               onChange={e => setForm(f => ({ ...f, quantity: parseInt(e.target.value) || 1 }))}
-              className="w-full border border-irs-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-irs-400"
+              className="w-full border border-irs-200 rounded px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-irs-400"
             />
           </div>
 
@@ -403,7 +403,7 @@ export function DonationBuilder({ editingRecord, onSave, onCancel }: DonationBui
                   min="0"
                   value={form.unitValue}
                   onChange={e => setForm(f => ({ ...f, unitValue: e.target.value }))}
-                  className="w-full border border-irs-200 rounded pl-7 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-irs-400"
+                  className="w-full border border-irs-200 rounded pl-7 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-irs-400"
                   placeholder="0.00"
                 />
               </div>
@@ -416,7 +416,7 @@ export function DonationBuilder({ editingRecord, onSave, onCancel }: DonationBui
                   ].map(v => (
                     <button key={v} type="button"
                       onClick={() => setForm(f => ({ ...f, unitValue: String(v) }))}
-                      className="px-2 py-1.5 bg-irs-100 hover:bg-irs-200 rounded text-xs text-irs-700 transition-colors">
+                      className="px-2.5 py-2 bg-irs-100 hover:bg-irs-200 active:bg-irs-300 rounded text-xs text-irs-700 transition-colors min-h-[36px]">
                       ${v}
                     </button>
                   ))}
@@ -438,7 +438,7 @@ export function DonationBuilder({ editingRecord, onSave, onCancel }: DonationBui
               type="text"
               value={form.description}
               onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-              className="w-full border border-irs-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-irs-400"
+              className="w-full border border-irs-200 rounded px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-irs-400"
               placeholder="Condition, color, brand..."
             />
           </div>
@@ -448,7 +448,7 @@ export function DonationBuilder({ editingRecord, onSave, onCancel }: DonationBui
           type="button"
           onClick={handleAddItem}
           disabled={!canAddItem}
-          className="mt-4 px-4 py-2 bg-irs-600 text-white rounded hover:bg-irs-700 transition-colors text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
+          className="mt-4 px-5 py-3 bg-irs-600 text-white rounded hover:bg-irs-700 active:bg-irs-800 transition-colors text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 min-h-[44px]"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -523,7 +523,7 @@ export function DonationBuilder({ editingRecord, onSave, onCancel }: DonationBui
                   type="text"
                   value={organization}
                   onChange={e => setOrganization(e.target.value)}
-                  className="flex-1 border border-irs-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-irs-400"
+                  className="flex-1 border border-irs-200 rounded px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-irs-400"
                   placeholder="e.g., Goodwill Industries"
                   autoComplete="off"
                 />
@@ -531,7 +531,7 @@ export function DonationBuilder({ editingRecord, onSave, onCancel }: DonationBui
                   type="button"
                   onClick={handleFindNearby}
                   disabled={isNearbySearching}
-                  className="flex-shrink-0 px-3 py-2 border border-irs-300 rounded text-sm text-irs-600 hover:bg-irs-50 transition-colors disabled:opacity-50 flex items-center gap-1.5 whitespace-nowrap"
+                  className="flex-shrink-0 px-3 py-2.5 border border-irs-300 rounded text-sm text-irs-600 hover:bg-irs-50 active:bg-irs-100 transition-colors disabled:opacity-50 flex items-center gap-1.5 whitespace-nowrap min-h-[44px]"
                 >
                   {isNearbySearching ? (
                     <>
@@ -565,7 +565,7 @@ export function DonationBuilder({ editingRecord, onSave, onCancel }: DonationBui
                   </div>
                   {nearbyPlaces.map(place => (
                     <button key={place.id} type="button" onClick={() => handleSelectPlace(place)}
-                      className="w-full text-left px-3 py-2.5 hover:bg-irs-50 transition-colors border-b border-irs-50 last:border-0">
+                      className="w-full text-left px-3 py-3 hover:bg-irs-50 active:bg-irs-100 transition-colors border-b border-irs-50 last:border-0 min-h-[44px]">
                       <div className="flex justify-between items-start gap-2">
                         <span className="text-sm font-medium text-irs-800">{place.name}</span>
                         {place.distance != null && (
@@ -588,7 +588,7 @@ export function DonationBuilder({ editingRecord, onSave, onCancel }: DonationBui
               type="date"
               value={date}
               onChange={e => setDate(e.target.value)}
-              className="w-full border border-irs-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-irs-400"
+              className="w-full border border-irs-200 rounded px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-irs-400"
             />
           </div>
 
@@ -614,11 +614,11 @@ export function DonationBuilder({ editingRecord, onSave, onCancel }: DonationBui
       {/* Actions */}
       <div className="p-6 flex gap-3">
         <button type="button" onClick={handleSave}
-          className="px-5 py-2 bg-irs-700 text-white rounded hover:bg-irs-800 transition-colors text-sm font-medium">
+          className="px-5 py-3 bg-irs-700 text-white rounded hover:bg-irs-800 active:bg-irs-900 transition-colors text-sm font-medium min-h-[44px]">
           {editingRecord ? 'Update Donation' : 'Save Donation'}
         </button>
         <button type="button" onClick={onCancel}
-          className="px-5 py-2 border border-irs-300 text-irs-600 rounded hover:bg-irs-50 transition-colors text-sm">
+          className="px-5 py-3 border border-irs-300 text-irs-600 rounded hover:bg-irs-50 active:bg-irs-100 transition-colors text-sm min-h-[44px]">
           {editingRecord ? 'Cancel' : 'Discard'}
         </button>
       </div>
