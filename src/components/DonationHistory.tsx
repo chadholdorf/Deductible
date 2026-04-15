@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import type { DonationRecord } from '../types/donation';
 import { CATEGORY_LABELS, CONDITION_LABELS, recordTotal } from '../types/donation';
+import { CATEGORY_ICONS } from '../App';
 
 interface DonationHistoryProps {
   records: DonationRecord[];
   onEdit: (record: DonationRecord) => void;
   onDelete: (id: string) => void;
+  sortMode?: 'date' | 'amount' | 'charity';
 }
 
 function formatDate(dateStr: string) {
@@ -17,7 +19,16 @@ function formatCurrency(value: number) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
 }
 
-export function DonationHistory({ records, onEdit, onDelete }: DonationHistoryProps) {
+/** Get the dominant category of a record (highest value) */
+function dominantCategory(record: DonationRecord): string {
+  const totals: Record<string, number> = {};
+  for (const item of record.items) {
+    totals[item.category] = (totals[item.category] ?? 0) + item.quantity * item.unitValue;
+  }
+  return Object.entries(totals).sort(([, a], [, b]) => b - a)[0]?.[0] ?? 'other';
+}
+
+export function DonationHistory({ records, onEdit, onDelete, sortMode = 'date' }: DonationHistoryProps) {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   function toggleExpand(id: string) {
@@ -38,38 +49,59 @@ export function DonationHistory({ records, onEdit, onDelete }: DonationHistoryPr
     );
   }
 
-  const sorted = [...records].sort((a, b) => b.date.localeCompare(a.date));
+  // Sort records based on mode
+  const sorted = [...records].sort((a, b) => {
+    if (sortMode === 'amount') return recordTotal(b) - recordTotal(a);
+    if (sortMode === 'charity') return a.organization.localeCompare(b.organization) || b.date.localeCompare(a.date);
+    return b.date.localeCompare(a.date); // default: date desc
+  });
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2.5">
       {sorted.map(record => {
         const total = recordTotal(record);
         const expanded = expandedIds.has(record.id);
+        const cat = dominantCategory(record);
+        const style = CATEGORY_ICONS[cat] ?? CATEGORY_ICONS.other;
+
+        // Build a brief item summary for the card
+        const itemSummary = record.items
+          .slice(0, 2)
+          .map(i => i.itemName)
+          .join(', ') + (record.items.length > 2 ? ` +${record.items.length - 2} more` : '');
+
         return (
           <div key={record.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
             <button
               type="button"
               onClick={() => toggleExpand(record.id)}
-              className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-750 active:bg-gray-100 dark:active:bg-gray-700 transition-colors min-h-[52px]"
+              className="w-full text-left px-4 py-3.5 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-750 active:bg-gray-100 dark:active:bg-gray-700 transition-colors min-h-[64px]"
             >
-              <svg
-                className={`w-4 h-4 flex-shrink-0 text-gray-400 dark:text-gray-500 transition-transform ${expanded ? 'rotate-90' : ''}`}
-                fill="none" stroke="currentColor" viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-baseline gap-2 flex-wrap">
-                  <span className="font-medium text-sm text-gray-800 dark:text-gray-100 truncate">{record.organization}</span>
-                  <span className="text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap">
-                    {record.items.length} item{record.items.length !== 1 ? 's' : ''}
-                  </span>
-                </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 font-mono mt-0.5">{formatDate(record.date)}</div>
+              {/* Category icon */}
+              <div className={`w-10 h-10 rounded-full ${style.bg} flex items-center justify-center text-base flex-shrink-0`}>
+                {style.icon}
               </div>
-              <span className="flex-shrink-0 font-mono font-semibold text-sm text-gray-800 dark:text-gray-100">
-                {formatCurrency(total)}
-              </span>
+
+              <div className="flex-1 min-w-0">
+                <div className="font-medium text-sm text-gray-800 dark:text-gray-100 truncate">
+                  {record.organization}
+                </div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                  {formatDate(record.date)} &middot; {itemSummary}
+                </div>
+              </div>
+
+              <div className="flex-shrink-0 text-right">
+                <div className="font-mono font-semibold text-sm text-gray-800 dark:text-gray-100">
+                  {formatCurrency(total)}
+                </div>
+                <svg
+                  className={`w-3.5 h-3.5 text-gray-400 transition-transform ml-auto mt-0.5 ${expanded ? 'rotate-90' : ''}`}
+                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
             </button>
 
             {expanded && (

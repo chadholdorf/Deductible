@@ -33,6 +33,7 @@ type NearbyStatus = 'idle' | 'locating' | 'searching' | 'done' | 'error';
 
 interface DonationBuilderProps {
   editingRecord?: DonationRecord | null;
+  startCategory?: DonationCategory | null;
   onSave: (record: Omit<DonationRecord, 'id'>) => void;
   onCancel: () => void;
 }
@@ -52,15 +53,23 @@ function formatCurrency(value: number) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
 }
 
-export function DonationBuilder({ editingRecord, onSave, onCancel }: DonationBuilderProps) {
+export function DonationBuilder({ editingRecord, startCategory, onSave, onCancel }: DonationBuilderProps) {
   const [items, setItems] = useState<DonationItem[]>(editingRecord?.items ?? []);
   const [organization, setOrganization] = useState(editingRecord?.organization ?? '');
   const [date, setDate] = useState(editingRecord?.date ?? '');
   const [errors, setErrors] = useState<string[]>([]);
   const [showCharityLookup, setShowCharityLookup] = useState(false);
 
-  // Item form state
-  const [form, setForm] = useState({ ...EMPTY_ITEM });
+  // Item form state — pre-select category if provided
+  const [form, setForm] = useState(() => {
+    if (startCategory) {
+      if (startCategory === 'mileage') {
+        return { ...EMPTY_ITEM, category: startCategory, itemName: 'Volunteer Driving', unitValue: String(CHARITY_MILEAGE_RATE) };
+      }
+      return { ...EMPTY_ITEM, category: startCategory };
+    }
+    return { ...EMPTY_ITEM };
+  });
 
   // Item search
   const [searchQuery, setSearchQuery] = useState('');

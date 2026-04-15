@@ -13,12 +13,13 @@ import type { DonationRecord, DonationCategory } from './types/donation';
 import { CATEGORY_LABELS, recordTotal } from './types/donation';
 
 type Mode = 'view' | 'building' | 'editing';
+type SortMode = 'date' | 'amount' | 'charity';
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
 }
 
-const CATEGORY_ICONS: Partial<Record<DonationCategory, { icon: string; bg: string; text: string }>> = {
+export const CATEGORY_ICONS: Record<string, { icon: string; bg: string; text: string }> = {
   clothing: { icon: '👔', bg: 'bg-blue-100 dark:bg-blue-900/40', text: 'text-blue-700 dark:text-blue-300' },
   cash: { icon: '💵', bg: 'bg-green-100 dark:bg-green-900/40', text: 'text-green-700 dark:text-green-300' },
   furniture: { icon: '🛋️', bg: 'bg-amber-100 dark:bg-amber-900/40', text: 'text-amber-700 dark:text-amber-300' },
@@ -38,6 +39,8 @@ function App() {
   const [editingRecord, setEditingRecord] = useState<DonationRecord | null>(null);
   const [showValuation, setShowValuation] = useState(false);
   const [showReport, setShowReport] = useState(false);
+  const [sortMode, setSortMode] = useState<SortMode>('date');
+  const [startCategory, setStartCategory] = useState<DonationCategory | null>(null);
 
   // Tax years
   const taxYears = useMemo(() => {
@@ -128,8 +131,9 @@ function App() {
         {mode !== 'view' ? (
           <DonationBuilder
             editingRecord={editingRecord}
-            onSave={handleSave}
-            onCancel={handleCancel}
+            startCategory={startCategory}
+            onSave={(data) => { setStartCategory(null); handleSave(data); }}
+            onCancel={() => { setStartCategory(null); handleCancel(); }}
           />
         ) : (
           <>
@@ -156,14 +160,14 @@ function App() {
             {activeCategories.length > 0 && (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                 {activeCategories.map(([cat, total]) => {
-                  const style = CATEGORY_ICONS[cat as DonationCategory] ?? CATEGORY_ICONS.other!;
+                  const style = CATEGORY_ICONS[cat as DonationCategory] ?? CATEGORY_ICONS.other;
                   return (
                     <div key={cat}
-                      className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 flex items-center gap-3">
+                      className="bg-white dark:bg-gray-800 rounded-xl p-3.5 border border-gray-200 dark:border-gray-700 flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-lg ${style.bg} flex items-center justify-center text-lg flex-shrink-0`}>
                         {style.icon}
                       </div>
-                      <div className="min-w-0">
+                      <div className="flex-1 min-w-0">
                         <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
                           {CATEGORY_LABELS[cat as DonationCategory]}
                         </div>
@@ -171,6 +175,15 @@ function App() {
                           {formatCurrency(total ?? 0)}
                         </div>
                       </div>
+                      <button
+                        onClick={() => { setStartCategory(cat as DonationCategory); setMode('building'); }}
+                        className="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-600 flex items-center justify-center text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-600 transition-colors flex-shrink-0"
+                        title={`Add ${CATEGORY_LABELS[cat as DonationCategory]}`}
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                      </button>
                     </div>
                   );
                 })}
@@ -188,6 +201,24 @@ function App() {
               <DataManagement onImport={reloadRecords} />
             </div>
 
+            {/* ── Sort Tabs + Count ── */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-0.5 gap-0.5">
+                  {([['date', 'Date'], ['amount', 'Amount'], ['charity', 'Charity']] as const).map(([key, label]) => (
+                    <button key={key} onClick={() => setSortMode(key)}
+                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors min-h-[32px] ${
+                        sortMode === key
+                          ? 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm'
+                          : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                      }`}>
+                      {label} {sortMode === key && (key === 'date' ? '↓' : key === 'amount' ? '$' : '$$')}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
             {/* ── Summary + History ── */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               <div className="md:col-span-1">
@@ -198,6 +229,7 @@ function App() {
                   records={yearRecords}
                   onEdit={handleEdit}
                   onDelete={deleteRecord}
+                  sortMode={sortMode}
                 />
               </div>
             </div>
@@ -208,7 +240,7 @@ function App() {
         {mode === 'view' && (
           <div className="fixed bottom-6 right-6 z-30 print:hidden">
             <button
-              onClick={() => setMode('building')}
+              onClick={() => { setStartCategory(null); setMode('building'); }}
               className="flex items-center gap-2 px-5 py-3.5 bg-irs-700 dark:bg-irs-600 text-white rounded-full shadow-lg hover:bg-irs-800 dark:hover:bg-irs-700 active:bg-irs-900 transition-colors text-sm font-semibold min-h-[52px]"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
