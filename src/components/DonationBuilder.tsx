@@ -72,6 +72,8 @@ export function DonationBuilder({ editingRecord, startCategory, onSave, onCancel
     return { ...EMPTY_ITEM };
   });
 
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
+
   // Item search
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
@@ -203,8 +205,8 @@ export function DonationBuilder({ editingRecord, startCategory, onSave, onCancel
 
   function handleAddItem() {
     if (!form.itemName.trim() || !form.unitValue || Number(form.unitValue) <= 0) return;
-    const newItem: DonationItem = {
-      id: crypto.randomUUID(),
+    const item: DonationItem = {
+      id: editingItemId ?? crypto.randomUUID(),
       category: form.category,
       itemName: form.itemName.trim(),
       quantity: Math.max(1, Math.round(form.quantity)),
@@ -212,14 +214,36 @@ export function DonationBuilder({ editingRecord, startCategory, onSave, onCancel
       description: form.description.trim(),
       condition: form.condition,
     };
-    setItems(prev => [...prev, newItem]);
-    // Reset form but keep category for rapid entry; clear search
+    if (editingItemId) {
+      setItems(prev => prev.map(i => i.id === editingItemId ? item : i));
+      setEditingItemId(null);
+    } else {
+      setItems(prev => [...prev, item]);
+    }
     setForm({ ...EMPTY_ITEM, category: form.category });
     setSearchQuery('');
     searchInputRef.current?.focus();
   }
 
+  function handleEditItem(item: DonationItem) {
+    setEditingItemId(item.id);
+    const guideMatch = guide.find(g => g.item === item.itemName);
+    const range = guideMatch ? { low: guideMatch.low, high: guideMatch.high } : null;
+    setForm({
+      category: item.category,
+      itemName: item.itemName,
+      quantity: item.quantity,
+      unitValue: String(item.unitValue),
+      description: item.description,
+      condition: item.condition ?? 'high',
+      selectedPreset: item.itemName,
+      suggestedRange: range,
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   function handleRemoveItem(id: string) {
+    if (editingItemId === id) setEditingItemId(null);
     setItems(prev => prev.filter(i => i.id !== id));
   }
 
@@ -528,17 +552,28 @@ export function DonationBuilder({ editingRecord, startCategory, onSave, onCancel
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={handleAddItem}
-          disabled={!canAddItem}
-          className="mt-4 px-5 py-3 bg-irs-600 text-white rounded hover:bg-irs-700 active:bg-irs-800 transition-colors text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 min-h-[44px]"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Add to List
-        </button>
+        <div className="mt-4 flex gap-2">
+          <button
+            type="button"
+            onClick={handleAddItem}
+            disabled={!canAddItem}
+            className="px-5 py-3 bg-irs-600 text-white rounded hover:bg-irs-700 active:bg-irs-800 transition-colors text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 min-h-[44px]"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={editingItemId ? 'M5 13l4 4L19 7' : 'M12 4v16m8-8H4'} />
+            </svg>
+            {editingItemId ? 'Update Item' : 'Add to List'}
+          </button>
+          {editingItemId && (
+            <button
+              type="button"
+              onClick={() => { setEditingItemId(null); setForm({ ...EMPTY_ITEM, category: form.category }); }}
+              className="px-4 py-3 border border-irs-300 text-irs-600 rounded hover:bg-irs-50 transition-colors text-sm min-h-[44px]"
+            >
+              Cancel
+            </button>
+          )}
+        </div>
       </div>
 
       {/* ── Item List ── */}
@@ -554,7 +589,11 @@ export function DonationBuilder({ editingRecord, startCategory, onSave, onCancel
           </h3>
           <div className="space-y-1">
             {items.map(item => (
-              <div key={item.id} className="flex items-center gap-3 bg-white rounded border border-irs-100 px-3 py-2 text-sm">
+              <div key={item.id} className={`flex items-center gap-3 rounded border px-3 py-2 text-sm transition-colors ${
+                editingItemId === item.id
+                  ? 'bg-irs-50 border-irs-400 ring-1 ring-irs-300'
+                  : 'bg-white border-irs-100'
+              }`}>
                 <span className="flex-shrink-0 px-1.5 py-0.5 bg-irs-100 text-irs-600 rounded text-xs">
                   {CATEGORY_LABELS[item.category]}
                 </span>
@@ -566,6 +605,16 @@ export function DonationBuilder({ editingRecord, startCategory, onSave, onCancel
                 <span className="flex-shrink-0 font-mono text-irs-700 font-medium">
                   {formatCurrency(item.quantity * item.unitValue)}
                 </span>
+                <button
+                  type="button"
+                  onClick={() => handleEditItem(item)}
+                  className="flex-shrink-0 text-irs-300 hover:text-irs-600 transition-colors"
+                  title="Edit"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                </button>
                 <button
                   type="button"
                   onClick={() => handleRemoveItem(item.id)}
