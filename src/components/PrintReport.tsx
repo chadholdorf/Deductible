@@ -1,5 +1,5 @@
 import type { DonationRecord } from '../types/donation';
-import { CATEGORY_LABELS, CONDITION_LABELS } from '../types/donation';
+import { CONDITION_LABELS } from '../types/donation';
 
 interface PrintReportProps {
   records: DonationRecord[];
