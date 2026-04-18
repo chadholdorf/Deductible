@@ -41,6 +41,7 @@ function App() {
   const [showReport, setShowReport] = useState(false);
   const [sortMode, setSortMode] = useState<SortMode>('date');
   const [startCategory, setStartCategory] = useState<DonationCategory | null>(null);
+  const [showTaxInsights, setShowTaxInsights] = useState(false);
   const [bracketRate, setBracketRate] = useState(() => {
     const saved = localStorage.getItem('its-deductible-bracket');
     return saved ? Number(saved) : 22;
@@ -141,74 +142,63 @@ function App() {
           />
         ) : (
           <>
-            {/* ── Hero Total Card ── */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-200 dark:border-gray-700">
-              <div className="flex items-center gap-2 mb-2">
-                <select
-                  value={selectedYear}
-                  onChange={e => setSelectedYear(Number(e.target.value))}
-                  className="text-sm font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 rounded-lg px-2.5 py-1.5 border-none focus:outline-none focus:ring-2 focus:ring-irs-400 min-h-[36px]"
-                >
-                  {taxYears.map(y => <option key={y} value={y}>{y}</option>)}
-                </select>
-              </div>
-              <div className="flex items-end justify-between gap-4 flex-wrap">
-                <div>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mb-0.5">Total Donations</p>
-                  <div className="text-4xl font-bold font-mono text-gray-900 dark:text-white tracking-tight">
-                    {formatCurrency(yearTotal)}
+            {/* ── Compact Hero ── */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl px-4 py-3.5 shadow-sm border border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <select
+                    value={selectedYear}
+                    onChange={e => setSelectedYear(Number(e.target.value))}
+                    className="text-sm font-semibold text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg px-2.5 py-1.5 border-none focus:outline-none focus:ring-2 focus:ring-irs-400 flex-shrink-0"
+                  >
+                    {taxYears.map(y => <option key={y} value={y}>{y}</option>)}
+                  </select>
+                  <div className="min-w-0">
+                    <div className="text-3xl font-bold font-mono text-gray-900 dark:text-white tracking-tight leading-none">
+                      {formatCurrency(yearTotal)}
+                    </div>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                      {yearRecords.length} donation{yearRecords.length !== 1 ? 's' : ''} · {new Set(yearRecords.map(r => r.organization)).size} {new Set(yearRecords.map(r => r.organization)).size === 1 ? 'charity' : 'charities'}
+                    </p>
                   </div>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                    {yearRecords.length} donation{yearRecords.length !== 1 ? 's' : ''} to {new Set(yearRecords.map(r => r.organization)).size} {new Set(yearRecords.map(r => r.organization)).size === 1 ? 'charity' : 'charities'}
-                  </p>
                 </div>
                 {yearTotal > 0 && (
-                  <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl px-4 py-3 text-right">
-                    <p className="text-xs text-green-600 dark:text-green-400 mb-0.5">Estimated Savings</p>
-                    <div className="text-2xl font-bold font-mono text-green-700 dark:text-green-400">
-                      {formatCurrency(yearTotal * (bracketRate / 100))}
+                  <div className="flex-shrink-0 flex items-center gap-2.5 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg px-3 py-2">
+                    <div className="text-right">
+                      <p className="text-[10px] uppercase tracking-wide text-green-600 dark:text-green-400 font-medium">Est. Savings</p>
+                      <div className="text-xl font-bold font-mono text-green-700 dark:text-green-300 leading-tight">
+                        {formatCurrency(yearTotal * (bracketRate / 100))}
+                      </div>
                     </div>
-                    <div className="flex items-center justify-end gap-1.5 mt-1">
-                      <span className="text-xs text-green-600 dark:text-green-500">at</span>
-                      <select
-                        value={bracketRate}
-                        onChange={e => { const v = Number(e.target.value); setBracketRate(v); localStorage.setItem('its-deductible-bracket', String(v)); }}
-                        className="text-xs text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/40 border-none rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-green-400"
-                      >
-                        {[10,12,22,24,32,35,37].map(r => <option key={r} value={r}>{r}% bracket</option>)}
-                      </select>
-                    </div>
+                    <select
+                      value={bracketRate}
+                      onChange={e => { const v = Number(e.target.value); setBracketRate(v); localStorage.setItem('its-deductible-bracket', String(v)); }}
+                      className="text-xs text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/40 border-none rounded px-1.5 py-1 focus:outline-none focus:ring-1 focus:ring-green-400"
+                    >
+                      {[10,12,22,24,32,35,37].map(r => <option key={r} value={r}>{r}%</option>)}
+                    </select>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* ── Category Grid ── */}
+            {/* ── Category chips — horizontal scroll ── */}
             {activeCategories.length > 0 && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 pb-0.5">
                 {activeCategories.map(([cat, total]) => {
                   const style = CATEGORY_ICONS[cat as DonationCategory] ?? CATEGORY_ICONS.other;
                   return (
-                    <div key={cat}
-                      className="bg-white dark:bg-gray-800 rounded-xl p-3.5 border border-gray-200 dark:border-gray-700 flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-lg ${style.bg} flex items-center justify-center text-lg flex-shrink-0`}>
-                        {style.icon}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                          {CATEGORY_LABELS[cat as DonationCategory]}
-                        </div>
-                        <div className={`text-sm font-bold font-mono ${style.text}`}>
-                          {formatCurrency(total ?? 0)}
-                        </div>
-                      </div>
+                    <div key={cat} className="flex-shrink-0 flex items-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full pl-2.5 pr-1.5 py-1.5 shadow-sm">
+                      <span className="text-sm leading-none">{style.icon}</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">{CATEGORY_LABELS[cat as DonationCategory]}</span>
+                      <span className={`text-xs font-bold font-mono whitespace-nowrap ${style.text}`}>{formatCurrency(total ?? 0)}</span>
                       <button
                         onClick={() => { setStartCategory(cat as DonationCategory); setMode('building'); }}
-                        className="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-600 flex items-center justify-center text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-600 transition-colors flex-shrink-0"
+                        className="w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-irs-100 dark:hover:bg-gray-600 flex items-center justify-center text-gray-400 hover:text-irs-600 transition-colors"
                         title={`Add ${CATEGORY_LABELS[cat as DonationCategory]}`}
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
                         </svg>
                       </button>
                     </div>
@@ -217,49 +207,63 @@ function App() {
               </div>
             )}
 
-            {/* ── Export / Tools Row ── */}
-            <div className="flex flex-wrap items-center gap-2">
-              <ExportCSV records={yearRecords} taxYear={selectedYear} />
-              <TXFExport records={yearRecords} taxYear={selectedYear} />
-              <button onClick={() => setShowReport(true)} disabled={yearRecords.length === 0}
-                className="px-3 py-2 text-xs border border-irs-200 dark:border-gray-600 text-irs-500 dark:text-gray-400 rounded hover:bg-irs-50 dark:hover:bg-gray-700 active:bg-irs-100 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
-                Export PDF
-              </button>
-              <DataManagement onImport={reloadRecords} />
-            </div>
-
-            {/* ── Sort Tabs + Count ── */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-0.5 gap-0.5">
-                  {([['date', 'Date'], ['amount', 'Amount'], ['charity', 'Charity']] as const).map(([key, label]) => (
-                    <button key={key} onClick={() => setSortMode(key)}
-                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors min-h-[32px] ${
-                        sortMode === key
-                          ? 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm'
-                          : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-                      }`}>
-                      {label} {sortMode === key && (key === 'date' ? '↓' : key === 'amount' ? '$' : '$$')}
-                    </button>
-                  ))}
-                </div>
+            {/* ── Sort + Actions row ── */}
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-0.5 gap-0.5">
+                {([['date', 'Date ↓'], ['amount', 'Amount'], ['charity', 'Charity']] as const).map(([key, label]) => (
+                  <button key={key} onClick={() => setSortMode(key)}
+                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors min-h-[32px] ${
+                      sortMode === key
+                        ? 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                    }`}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <ExportCSV records={yearRecords} taxYear={selectedYear} />
+                <TXFExport records={yearRecords} taxYear={selectedYear} />
+                <button onClick={() => setShowReport(true)} disabled={yearRecords.length === 0}
+                  className="px-3 py-1.5 text-xs border border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                  PDF
+                </button>
+                <DataManagement onImport={reloadRecords} />
               </div>
             </div>
 
-            {/* ── Summary + History ── */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              <div className="md:col-span-1">
-                <Summary records={yearRecords} taxYear={selectedYear} bracketRate={bracketRate} onBracketChange={v => { setBracketRate(v); localStorage.setItem('its-deductible-bracket', String(v)); }} />
+            {/* ── Full-width History ── */}
+            <DonationHistory
+              records={yearRecords}
+              onEdit={handleEdit}
+              onDelete={deleteRecord}
+              sortMode={sortMode}
+            />
+
+            {/* ── Tax Insights (collapsible) ── */}
+            {yearTotal > 0 && (
+              <div className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+                <button
+                  onClick={() => setShowTaxInsights(v => !v)}
+                  className="w-full flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors text-left"
+                >
+                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-200 flex items-center gap-2">
+                    <svg className="w-4 h-4 text-irs-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    Tax Insights &amp; IRS Notes
+                  </span>
+                  <svg className={`w-4 h-4 text-gray-400 transition-transform ${showTaxInsights ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {showTaxInsights && (
+                  <div className="border-t border-gray-100 dark:border-gray-700 p-4 bg-gray-50/50 dark:bg-gray-900/30">
+                    <Summary records={yearRecords} taxYear={selectedYear} bracketRate={bracketRate} onBracketChange={v => { setBracketRate(v); localStorage.setItem('its-deductible-bracket', String(v)); }} />
+                  </div>
+                )}
               </div>
-              <div className="md:col-span-2">
-                <DonationHistory
-                  records={yearRecords}
-                  onEdit={handleEdit}
-                  onDelete={deleteRecord}
-                  sortMode={sortMode}
-                />
-              </div>
-            </div>
+            )}
           </>
         )}
 
