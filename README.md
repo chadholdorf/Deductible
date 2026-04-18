@@ -14,53 +14,57 @@ Intuit's ItsDeductible was a popular free tool that helped taxpayers track chari
 
 ## How It Works
 
-The app follows a simple workflow that mirrors how people actually donate:
+### 1. Start a New Donation
 
-### 1. Start a New Donation List
-
-Click "Start New Donation List" to begin. Each list represents one trip to a donation center.
+Click **New Donation** to begin. Each donation represents one trip to a donation center.
 
 ### 2. Search and Add Items
 
-Type in the search box to find items from the built-in valuation guide (269 items with FMV ranges). The app auto-fills the category, item name, suggested value, and lets you set the condition (High/Good/Fair/Poor) and quantity. You can also enter items manually.
-
-Keep clicking "Add to List" for each item. The running total updates as you go.
+Type in the search box to find items from the built-in valuation guide (269 items with FMV ranges). The app auto-fills the category, item name, suggested value range, and condition. Changing the condition (High/Good/Fair/Poor) automatically updates the suggested value. You can also browse by category or enter items manually. Edit any item in the list before saving.
 
 ### 3. Pick Where and When
 
-Once your item list is complete, enter the organization name (or use "Find Nearby" to search for local donation centers via OpenStreetMap) and the date.
+Enter the organization name — recently used orgs appear as quick-select options. Use **Find Nearby** to search for local donation centers via OpenStreetMap (text you've typed is used as a search hint), or use **501(c)(3)** to verify an organization's tax-exempt status via ProPublica. Add the charity's address if your non-cash total exceeds $500 (required for Form 8283). The date defaults to today.
 
 ### 4. Save
 
-Click "Save Donation" and the whole list is stored. Repeat throughout the year as you make more donations.
+Click **Save Donation** and the whole list is stored. Repeat throughout the year.
 
 ### 5. Review and Export
 
-At year end, your Summary panel shows totals by category, estimated tax savings based on your bracket, and IRS threshold warnings (Form 8283, appraisal requirements). You can:
+At year end, review your history sorted by date, amount, or charity. The **Tax Insights** panel shows totals by category, estimated tax savings by bracket, itemizing vs. standard deduction guidance, and IRS threshold warnings. Export your data:
 
-- **Export CSV** for your tax preparer or to open in Google Sheets
-- **Print Report** to get a formatted "YTD Charitable Deductions" summary matching the original ItsDeductible report format, split into Non-Cash and Cash sections with subtotals per charity
+- **CSV** — full detail for your tax preparer or Google Sheets
+- **TurboTax (.txf)** — import directly into TurboTax
+- **PDF** — formatted "YTD Charitable Deductions" report with Non-Cash and Cash sections
+- **Backup / Restore** — full JSON export and import for safekeeping
 
 ## Features
 
-- **Donation list builder** with a step-by-step flow: add items, then assign organization and date
-- **Built-in FMV valuation guide** with 269 items across 8 categories, updated to 2025 Salvation Army/Goodwill values
-- **Item search** that filters the entire guide as you type
-- **Smart presets** that auto-suggest fair market value ranges with low/mid/high quick-pick buttons
-- **Item condition tracking** (High, Good, Fair, Poor) per item
-- **Nearby donation center lookup** using your location and OpenStreetMap data
-- **Tax year filtering** with running totals by category
-- **Tax Insights panel** with estimated savings by bracket, itemizing vs. standard deduction guidance, Form 8283 and appraisal warnings
-- **CSV export** with full detail (date, org, category, item, condition, qty, value, notes)
-- **Print report** matching the ItsDeductible "YTD Charitable Deductions" format
-- **Edit and delete** any saved donation
-- **Mobile-friendly** responsive design with 44px+ touch targets
-- **Sample data included** (8 donations across 2023-2024) so the app is useful on first load
+- **Donation list builder** — step-by-step flow: add items, then assign organization and date
+- **Built-in FMV valuation guide** — 269 items across 8 categories, updated to 2025 Salvation Army/Goodwill values
+- **Item search** — filters the entire guide as you type
+- **Inline item editing** — edit any item in the list before saving
+- **Smart presets** — auto-suggest FMV ranges with low/mid/high quick-pick buttons
+- **Condition → value mapping** — changing High/Good/Fair/Poor instantly updates the suggested value
+- **Volunteer mileage** — built-in IRS charitable mileage rate ($0.14/mile)
+- **Nearby donation center lookup** — uses your location + typed text via OpenStreetMap and Nominatim
+- **501(c)(3) verification** — search the IRS database via ProPublica Nonprofit Explorer
+- **Recent organizations** — previously used org names appear as quick-select when you focus the field
+- **Organization address** — stored per donation, auto-filled from lookup, shown in reports (required for Form 8283)
+- **Tax year filtering** — view any past year's donations separately
+- **Estimated savings** — live on the homepage hero card, bracket selector persists across sessions
+- **Tax Insights panel** — collapsible, includes savings calculator, standard deduction comparison, IRS warnings
+- **Tiered IRS warnings** — contextual alerts at $250 (receipt required), $500 (Form 8283), and $5,000 (appraisal)
+- **Sort tabs** — sort history by date, amount, or charity name (shown when 2+ donations exist)
+- **CSV export** — full detail (date, org, address, category, item, condition, qty, value, notes)
+- **TXF export** — TurboTax-compatible format with IRS codes 488 (cash) and 489 (non-cash)
+- **PDF report** — matches the ItsDeductible "YTD Charitable Deductions" format with org addresses
+- **JSON backup/restore** — full data export and import
+- **Edit and delete** — any saved donation
+- **Dark mode** — respects system preference, toggleable
+- **Mobile-first** — responsive design with 44px+ touch targets
 - **Zero backend** — all data in localStorage, no accounts, no tracking
-
-## Screenshots
-
-> Add screenshots here
 
 ## Getting Started
 
@@ -72,8 +76,8 @@ At year end, your Summary panel shows totals by category, estimated tax savings 
 ### Install and Run
 
 ```bash
-git clone https://github.com/chadholdorf/deductible.git
-cd deductible
+git clone https://github.com/chadholdorf/Deductible.git
+cd Deductible
 npm install
 npm run dev
 ```
@@ -104,43 +108,52 @@ This repo includes a GitHub Actions workflow that auto-deploys on push to `main`
 2. Under **Source**, select **GitHub Actions**
 3. Push to `main` and the workflow handles the rest
 
-> **Note:** For GitHub Pages, update the `GITHUB_PAGES` env var handling in `vite.config.ts` if your repo name differs from `deductible`.
-
 ## Data and Privacy
 
 All data stays in your browser's localStorage. There is no backend, no database, no analytics, no cookies, no tracking.
 
 - **One user per browser** — whoever opens the app sees the same data
 - **Not synced across devices** — Chrome on your laptop and Safari on your phone are separate
-- **Clearable** — if you clear browser data, donations are gone (export CSV first as a backup)
+- **Clearable** — if you clear browser data, donations are gone (use Backup Data first)
 
-**Tip:** Periodically export the CSV and save it to Google Drive or Dropbox as a backup.
+**Tip:** Use **Backup Data** periodically to export a JSON file and save it to Google Drive or Dropbox.
 
 ## Value Reference Data
 
-The built-in FMV guide at `src/data/valuationGuide.json` contains 269 items across 8 categories:
+The built-in FMV guide (`src/data/valuationGuide.json`) contains 269 items across 8 categories:
 
-- Men's Clothing (32 items)
-- Women's Clothing (38 items)
-- Children's Clothing (20 items)
-- Furniture (36 items)
-- Household Items (36 items)
-- Electronics (28 items)
-- Appliances (32 items)
-- Books, Media & Toys (47 items)
+| Category | Items |
+|---|---|
+| Men's Clothing | 32 |
+| Women's Clothing | 38 |
+| Children's Clothing | 20 |
+| Furniture | 36 |
+| Household Items | 36 |
+| Electronics | 28 |
+| Appliances | 32 |
+| Books, Media & Toys | 47 |
 
-Values are aligned with 2025 published guides from the Salvation Army, Goodwill, and IRS Publication 561 for items in good, used condition.
+Values are aligned with 2025 published guides from the Salvation Army, Goodwill, and IRS Publication 561.
 
-> **Important:** These values are guidelines. The IRS requires you to determine the fair market value of each donated item based on its specific condition. When in doubt, consult a qualified tax professional.
+> **Important:** These are guidelines. The IRS requires you to determine fair market value based on each item's specific condition. Consult a qualified tax professional when in doubt.
 
 ## Tech Stack
 
-- [React](https://react.dev) 18 + [TypeScript](https://www.typescriptlang.org/)
+- [React](https://react.dev) 18 + [TypeScript](https://www.typescriptlang.org/) (strict)
 - [Vite](https://vitejs.dev) for builds
 - [Tailwind CSS](https://tailwindcss.com) for styling
-- localStorage for persistence
-- [OpenStreetMap Overpass API](https://overpass-api.de/) for nearby search (no API key needed)
+- localStorage for all persistence
+- [OpenStreetMap Overpass API](https://overpass-api.de/) + [Nominatim](https://nominatim.org/) for nearby search
+- [ProPublica Nonprofit Explorer API](https://projects.propublica.org/nonprofits/) for 501(c)(3) lookup
 - No backend, no database, no auth
+
+## What to Build Next
+
+1. **Photo/receipt capture** — attach a photo of the receipt for audit trail
+2. **Recurring donations** — auto-populate for regular giving
+3. **Multi-year trend view** — year-over-year donation comparison chart
+4. **PWA support** — offline-capable with service worker for use at donation centers
+5. **FMV guide updates** — mechanism to refresh valuation data beyond 2025
 
 ## Contributing
 
@@ -152,7 +165,7 @@ Contributions are welcome!
 4. Push to your fork: `git push origin my-feature`
 5. Open a pull request
 
-Keep PRs focused on a single change. If adding new valuation items, include a source for the FMV ranges.
+Keep PRs focused on a single change. If adding valuation items, include a source for the FMV ranges.
 
 ## License
 
