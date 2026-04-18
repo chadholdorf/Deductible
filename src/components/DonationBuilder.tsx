@@ -56,7 +56,7 @@ function formatCurrency(value: number) {
 export function DonationBuilder({ editingRecord, startCategory, onSave, onCancel }: DonationBuilderProps) {
   const [items, setItems] = useState<DonationItem[]>(editingRecord?.items ?? []);
   const [organization, setOrganization] = useState(editingRecord?.organization ?? '');
-  const [date, setDate] = useState(editingRecord?.date ?? '');
+  const [date, setDate] = useState(editingRecord?.date ?? new Date().toISOString().split('T')[0]);
   const [errors, setErrors] = useState<string[]>([]);
   const [showCharityLookup, setShowCharityLookup] = useState(false);
 
