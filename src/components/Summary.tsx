@@ -59,6 +59,17 @@ export function Summary({ records, taxYear }: SummaryProps) {
   const needsForm8283 = nonCashTotal > 500;
   const needsAppraisal = maxSingleItemValue > 5000;
 
+  // Per-record acknowledgment check: any single donation ≥ $250 needs written receipt
+  const recordsNeedingAcknowledgment = records.filter(r => {
+    const nonCash = r.items.filter(i => i.category !== 'cash').reduce((s, i) => s + i.quantity * i.unitValue, 0);
+    return nonCash >= 250;
+  });
+  const needsAcknowledgment = recordsNeedingAcknowledgment.length > 0;
+  const missingAddress = needsForm8283 && records.filter(r => {
+    const nonCash = r.items.filter(i => i.category !== 'cash').reduce((s, i) => s + i.quantity * i.unitValue, 0);
+    return nonCash > 0 && !r.organizationAddress;
+  }).length > 0;
+
   return (
     <div className="space-y-4">
       {/* Category Totals */}
@@ -184,41 +195,48 @@ export function Summary({ records, taxYear }: SummaryProps) {
 
           {/* IRS thresholds & warnings */}
           <div className="space-y-2">
-            {needsForm8283 && (
-              <div className="flex gap-2 p-2.5 bg-amber-50 border border-amber-200 rounded-lg">
-                <svg className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <div className="text-xs text-amber-800">
-                  <strong>Form 8283 required.</strong> Your non-cash donations
-                  ({formatCurrency(nonCashTotal)}) exceed $500. You must file
-                  IRS Form 8283 with your return.
-                </div>
-              </div>
-            )}
 
             {needsAppraisal && (
               <div className="flex gap-2 p-2.5 bg-red-50 border border-red-200 rounded-lg">
                 <svg className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <div className="text-xs text-red-800">
-                  <strong>Qualified appraisal needed.</strong> You have an item valued
-                  over $5,000. The IRS requires a qualified independent appraisal
-                  for single items (or groups of similar items) exceeding $5,000.
+                  <strong>Qualified appraisal required.</strong> An item is valued over $5,000. The IRS requires a written qualified appraisal and Form 8283 Section B.
                 </div>
               </div>
             )}
 
-            {nonCashTotal > 0 && !needsForm8283 && (
-              <div className="flex gap-2 p-2.5 bg-irs-50 border border-irs-200 dark:border-gray-600 rounded-lg">
-                <svg className="w-4 h-4 text-irs-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {needsForm8283 && (
+              <div className="flex gap-2 p-2.5 bg-amber-50 border border-amber-200 rounded-lg">
+                <svg className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div className="text-xs text-amber-800">
+                  <strong>Form 8283 required.</strong> Non-cash donations ({formatCurrency(nonCashTotal)}) exceed $500 — file IRS Form 8283 with your return. The form requires each charity's name and address.
+                  {missingAddress && <span className="block mt-1 font-medium">⚠ Some donations are missing an address — edit them to add it.</span>}
+                </div>
+              </div>
+            )}
+
+            {needsAcknowledgment && (
+              <div className="flex gap-2 p-2.5 bg-blue-50 border border-blue-200 rounded-lg">
+                <svg className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <div className="text-xs text-blue-800">
+                  <strong>Written receipt required.</strong> {recordsNeedingAcknowledgment.length === 1 ? 'A donation' : `${recordsNeedingAcknowledgment.length} donations`} exceed{recordsNeedingAcknowledgment.length === 1 ? 's' : ''} $250. The IRS requires a written acknowledgment from the charity — keep the receipt they gave you at drop-off.
+                </div>
+              </div>
+            )}
+
+            {nonCashTotal > 0 && !needsForm8283 && !needsAcknowledgment && (
+              <div className="flex gap-2 p-2.5 bg-green-50 border border-green-200 rounded-lg">
+                <svg className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <div className="text-xs text-irs-600">
-                  Non-cash donations under $500. No additional forms required beyond your tax return.
+                <div className="text-xs text-green-700">
+                  Non-cash donations are under $250 each. No receipt or additional forms required — just keep this record.
                 </div>
               </div>
             )}

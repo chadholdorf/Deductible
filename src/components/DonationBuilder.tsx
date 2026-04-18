@@ -56,6 +56,7 @@ function formatCurrency(value: number) {
 export function DonationBuilder({ editingRecord, startCategory, onSave, onCancel }: DonationBuilderProps) {
   const [items, setItems] = useState<DonationItem[]>(editingRecord?.items ?? []);
   const [organization, setOrganization] = useState(editingRecord?.organization ?? '');
+  const [organizationAddress, setOrganizationAddress] = useState(editingRecord?.organizationAddress ?? '');
   const [date, setDate] = useState(editingRecord?.date ?? new Date().toISOString().split('T')[0]);
   const [errors, setErrors] = useState<string[]>([]);
   const [showCharityLookup, setShowCharityLookup] = useState(false);
@@ -95,6 +96,7 @@ export function DonationBuilder({ editingRecord, startCategory, onSave, onCancel
     if (editingRecord) {
       setItems(editingRecord.items);
       setOrganization(editingRecord.organization);
+      setOrganizationAddress(editingRecord.organizationAddress ?? '');
       setDate(editingRecord.date);
     }
   }, [editingRecord]);
@@ -238,7 +240,7 @@ export function DonationBuilder({ editingRecord, startCategory, onSave, onCancel
     if (errs.length) return;
     const taxYear = new Date(date + 'T00:00:00').getFullYear();
     updateRecentOrgs(organization);
-    onSave({ organization: organization.trim(), date, taxYear, items });
+    onSave({ organization: organization.trim(), organizationAddress: organizationAddress.trim() || undefined, date, taxYear, items });
   }
 
   // Nearby lookup
@@ -277,6 +279,7 @@ export function DonationBuilder({ editingRecord, startCategory, onSave, onCancel
 
   function handleSelectPlace(place: NearbyPlace) {
     setOrganization(place.name);
+    setOrganizationAddress(place.address ?? '');
     setShowNearbyDropdown(false);
     setNearbyStatus('idle');
   }
@@ -650,6 +653,14 @@ export function DonationBuilder({ editingRecord, startCategory, onSave, onCancel
               {nearbyStatus === 'error' && nearbyError && (
                 <p className="mt-1 text-xs text-amber-600">{nearbyError}</p>
               )}
+              <input
+                type="text"
+                value={organizationAddress}
+                onChange={e => setOrganizationAddress(e.target.value)}
+                className="mt-2 w-full border border-irs-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-irs-400 text-gray-600 placeholder-gray-400"
+                placeholder="Address (optional — required for Form 8283 if total exceeds $500)"
+                autoComplete="off"
+              />
 
               {/* Recents dropdown */}
               {showRecentsDropdown && !showNearbyDropdown && (() => {
@@ -746,7 +757,7 @@ export function DonationBuilder({ editingRecord, startCategory, onSave, onCancel
       <CharityLookup
         isOpen={showCharityLookup}
         onClose={() => setShowCharityLookup(false)}
-        onSelect={(name) => setOrganization(name)}
+        onSelect={(name, address) => { setOrganization(name); setOrganizationAddress(address ?? ''); }}
       />
     </div>
   );

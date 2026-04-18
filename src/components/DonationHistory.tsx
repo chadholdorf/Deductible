@@ -107,6 +107,15 @@ export function DonationHistory({ records, onEdit, onDelete, sortMode = 'date' }
             {expanded && (
               <div className="border-t border-gray-100 dark:border-gray-700">
                 <div className="px-4 py-3 space-y-2 bg-gray-50/60 dark:bg-gray-900/40">
+                  {record.organizationAddress && (
+                    <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1 pb-1">
+                      <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      {record.organizationAddress}
+                    </p>
+                  )}
                   {record.items.map(item => (
                     <div key={item.id} className="flex items-start gap-2 text-sm">
                       <span className="flex-shrink-0 px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded text-xs mt-0.5">

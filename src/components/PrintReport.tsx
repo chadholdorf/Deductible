@@ -18,8 +18,8 @@ function formatCurrency(value: number) {
 
 export function PrintReport({ records, taxYear, onClose }: PrintReportProps) {
   // Split into cash and non-cash
-  const cashRecords: { org: string; date: string; items: string; total: number }[] = [];
-  const nonCashByOrg: Record<string, { dates: { date: string; items: string; total: number }[] }> = {};
+  const cashRecords: { org: string; address?: string; date: string; items: string; total: number }[] = [];
+  const nonCashByOrg: Record<string, { address?: string; dates: { date: string; items: string; total: number }[] }> = {};
 
   let totalCash = 0;
   let totalNonCash = 0;
@@ -34,6 +34,7 @@ export function PrintReport({ records, taxYear, onClose }: PrintReportProps) {
       totalCash += cashTotal;
       cashRecords.push({
         org: record.organization,
+        address: record.organizationAddress,
         date: record.date,
         items: cashItems.map(i => i.description || i.itemName).join(', '),
         total: cashTotal,
@@ -43,7 +44,7 @@ export function PrintReport({ records, taxYear, onClose }: PrintReportProps) {
     // Non-cash items — group by organization
     if (nonCashItems.length > 0) {
       if (!nonCashByOrg[record.organization]) {
-        nonCashByOrg[record.organization] = { dates: [] };
+        nonCashByOrg[record.organization] = { address: record.organizationAddress, dates: [] };
       }
       const dateTotal = nonCashItems.reduce((s, i) => s + i.quantity * i.unitValue, 0);
       totalNonCash += dateTotal;
@@ -132,7 +133,10 @@ export function PrintReport({ records, taxYear, onClose }: PrintReportProps) {
                 <div key={org} className="mb-4">
                   {/* Org name */}
                   <div className="grid grid-cols-[140px_1fr_100px] gap-2 border-b border-gray-300 px-2 py-1.5 bg-gray-50">
-                    <div className="font-bold text-sm">{org}</div>
+                    <div>
+                      <div className="font-bold text-sm">{org}</div>
+                      {data.address && <div className="text-[10px] text-gray-500 mt-0.5">{data.address}</div>}
+                    </div>
                     <div></div>
                     <div></div>
                   </div>
@@ -189,7 +193,10 @@ export function PrintReport({ records, taxYear, onClose }: PrintReportProps) {
           ) : (
             cashRecords.map((cr, i) => (
               <div key={`cash-${i}`} className="grid grid-cols-[140px_1fr_100px] gap-2 px-2 py-2 border-b border-gray-100">
-                <div className="text-sm font-medium text-gray-800">{cr.org}</div>
+                <div>
+                  <div className="text-sm font-medium text-gray-800">{cr.org}</div>
+                  {cr.address && <div className="text-[10px] text-gray-500 mt-0.5">{cr.address}</div>}
+                </div>
                 <div className="text-[12px] text-gray-700">
                   {formatDate(cr.date)}{cr.items ? ` — ${cr.items}` : ''}
                 </div>

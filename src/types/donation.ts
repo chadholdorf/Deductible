@@ -36,6 +36,7 @@ export interface DonationItem {
 export interface DonationRecord {
   id: string;
   organization: string;
+  organizationAddress?: string;
   date: string; // YYYY-MM-DD
   taxYear: number;
   items: DonationItem[];

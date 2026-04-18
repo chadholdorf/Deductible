@@ -11,7 +11,7 @@ interface CharityResult {
 }
 
 interface CharityLookupProps {
-  onSelect: (name: string) => void;
+  onSelect: (name: string, address?: string) => void;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -65,7 +65,8 @@ export function CharityLookup({ onSelect, isOpen, onClose }: CharityLookupProps)
   }
 
   function handleSelect(org: CharityResult) {
-    onSelect(org.name);
+    const addressParts = [org.address, org.city, org.state].filter(Boolean);
+    onSelect(org.name, addressParts.length ? addressParts.join(', ') : undefined);
     onClose();
   }
 
