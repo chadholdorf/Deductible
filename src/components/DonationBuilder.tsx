@@ -44,7 +44,7 @@ const EMPTY_ITEM = {
   quantity: 1,
   unitValue: '',
   description: '',
-  condition: 'good' as ItemCondition,
+  condition: 'high' as ItemCondition,
   selectedPreset: '',
   suggestedRange: null as { low: number; high: number } | null,
 };
@@ -126,7 +126,7 @@ export function DonationBuilder({ editingRecord, startCategory, onSave, onCancel
   function handleSearchSelect(guideItem: ValuationItem) {
     const donationCat = GUIDE_TO_DONATION_CATEGORY[guideItem.category] ?? 'other';
     const range = { low: guideItem.low, high: guideItem.high };
-    const condition: ItemCondition = 'good';
+    const condition: ItemCondition = 'high';
     setForm({
       category: donationCat,
       itemName: guideItem.item,
