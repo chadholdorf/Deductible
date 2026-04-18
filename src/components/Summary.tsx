@@ -5,6 +5,8 @@ import { CATEGORY_LABELS } from '../types/donation';
 interface SummaryProps {
   records: DonationRecord[];
   taxYear: number;
+  bracketRate?: number;
+  onBracketChange?: (rate: number) => void;
 }
 
 function formatCurrency(value: number) {
@@ -27,8 +29,10 @@ const STANDARD_DEDUCTION = {
   married: 30000,
 };
 
-export function Summary({ records, taxYear }: SummaryProps) {
-  const [bracketRate, setBracketRate] = useState(22);
+export function Summary({ records, taxYear, bracketRate: bracketRateProp, onBracketChange }: SummaryProps) {
+  const [localRate, setLocalRate] = useState(22);
+  const bracketRate = bracketRateProp ?? localRate;
+  function setBracketRate(v: number) { setLocalRate(v); onBracketChange?.(v); }
 
   // Aggregate by category across all records
   const categoryTotals: Partial<Record<DonationCategory, number>> = {};

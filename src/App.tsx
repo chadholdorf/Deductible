@@ -41,6 +41,10 @@ function App() {
   const [showReport, setShowReport] = useState(false);
   const [sortMode, setSortMode] = useState<SortMode>('date');
   const [startCategory, setStartCategory] = useState<DonationCategory | null>(null);
+  const [bracketRate, setBracketRate] = useState(() => {
+    const saved = localStorage.getItem('its-deductible-bracket');
+    return saved ? Number(saved) : 22;
+  });
 
   // Tax years
   const taxYears = useMemo(() => {
@@ -148,12 +152,35 @@ function App() {
                   {taxYears.map(y => <option key={y} value={y}>{y}</option>)}
                 </select>
               </div>
-              <div className="text-4xl font-bold font-mono text-gray-900 dark:text-white tracking-tight">
-                {formatCurrency(yearTotal)}
+              <div className="flex items-end justify-between gap-4 flex-wrap">
+                <div>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mb-0.5">Total Donations</p>
+                  <div className="text-4xl font-bold font-mono text-gray-900 dark:text-white tracking-tight">
+                    {formatCurrency(yearTotal)}
+                  </div>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                    {yearRecords.length} donation{yearRecords.length !== 1 ? 's' : ''} to {new Set(yearRecords.map(r => r.organization)).size} {new Set(yearRecords.map(r => r.organization)).size === 1 ? 'charity' : 'charities'}
+                  </p>
+                </div>
+                {yearTotal > 0 && (
+                  <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl px-4 py-3 text-right">
+                    <p className="text-xs text-green-600 dark:text-green-400 mb-0.5">Estimated Savings</p>
+                    <div className="text-2xl font-bold font-mono text-green-700 dark:text-green-400">
+                      {formatCurrency(yearTotal * (bracketRate / 100))}
+                    </div>
+                    <div className="flex items-center justify-end gap-1.5 mt-1">
+                      <span className="text-xs text-green-600 dark:text-green-500">at</span>
+                      <select
+                        value={bracketRate}
+                        onChange={e => { const v = Number(e.target.value); setBracketRate(v); localStorage.setItem('its-deductible-bracket', String(v)); }}
+                        className="text-xs text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/40 border-none rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-green-400"
+                      >
+                        {[10,12,22,24,32,35,37].map(r => <option key={r} value={r}>{r}% bracket</option>)}
+                      </select>
+                    </div>
+                  </div>
+                )}
               </div>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                {yearRecords.length} donation{yearRecords.length !== 1 ? 's' : ''} to {new Set(yearRecords.map(r => r.organization)).size} {new Set(yearRecords.map(r => r.organization)).size === 1 ? 'charity' : 'charities'}
-              </p>
             </div>
 
             {/* ── Category Grid ── */}
@@ -222,7 +249,7 @@ function App() {
             {/* ── Summary + History ── */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               <div className="md:col-span-1">
-                <Summary records={yearRecords} taxYear={selectedYear} />
+                <Summary records={yearRecords} taxYear={selectedYear} bracketRate={bracketRate} onBracketChange={v => { setBracketRate(v); localStorage.setItem('its-deductible-bracket', String(v)); }} />
               </div>
               <div className="md:col-span-2">
                 <DonationHistory
