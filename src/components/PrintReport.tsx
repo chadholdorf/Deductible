@@ -51,10 +51,9 @@ export function PrintReport({ records, taxYear, onClose }: PrintReportProps) {
 
       // Build comma-separated item list with details
       const itemDescriptions = nonCashItems.map(item => {
-        const cat = CATEGORY_LABELS[item.category];
         const cond = item.condition ? CONDITION_LABELS[item.condition] : 'Good';
-        const qty = item.quantity > 1 ? ` (×${item.quantity})` : '';
-        return `${item.itemName}${qty}: ${cond}, ${cat}`;
+        const qty = item.quantity > 1 ? ` ×${item.quantity}` : '';
+        return `${item.itemName}${qty} (${cond})`;
       });
 
       nonCashByOrg[record.organization].dates.push({
@@ -131,14 +130,10 @@ export function PrintReport({ records, taxYear, onClose }: PrintReportProps) {
               const orgTotal = data.dates.reduce((s, d) => s + d.total, 0);
               return (
                 <div key={org} className="mb-4">
-                  {/* Org name */}
-                  <div className="grid grid-cols-[140px_1fr_100px] gap-2 border-b border-gray-300 px-2 py-1.5 bg-gray-50">
-                    <div>
-                      <div className="font-bold text-sm">{org}</div>
-                      {data.address && <div className="text-[10px] text-gray-500 mt-0.5">{data.address}</div>}
-                    </div>
-                    <div></div>
-                    <div></div>
+                  {/* Org name — spans full width */}
+                  <div className="border-b border-gray-300 px-2 py-1.5 bg-gray-50">
+                    <div className="font-bold text-sm">{org}</div>
+                    {data.address && <div className="text-[10px] text-gray-500 mt-0.5">{data.address}</div>}
                   </div>
 
                   <div className="px-2 py-1 text-xs text-gray-500 font-medium">Item Donations</div>
