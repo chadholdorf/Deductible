@@ -10,7 +10,7 @@ import { TXFExport } from './components/TXFExport';
 import { PrintReport } from './components/PrintReport';
 import { DataManagement } from './components/DataManagement';
 import type { DonationRecord, DonationCategory } from './types/donation';
-import { CATEGORY_LABELS, recordTotal } from './types/donation';
+import { recordTotal } from './types/donation';
 
 type Mode = 'view' | 'building' | 'editing';
 type SortMode = 'date' | 'amount' | 'charity';
@@ -65,20 +65,6 @@ function App() {
     () => yearRecords.reduce((sum, r) => sum + recordTotal(r), 0),
     [yearRecords]
   );
-
-  // Category totals for the grid
-  const categoryTotals = useMemo(() => {
-    const totals: Partial<Record<DonationCategory, number>> = {};
-    for (const record of yearRecords) {
-      for (const item of record.items) {
-        const v = item.quantity * item.unitValue;
-        totals[item.category] = (totals[item.category] ?? 0) + v;
-      }
-    }
-    return totals;
-  }, [yearRecords]);
-
-  const activeCategories = Object.entries(categoryTotals).sort(([, a], [, b]) => (b ?? 0) - (a ?? 0));
 
   function handleSave(data: Omit<DonationRecord, 'id'>) {
     if (editingRecord) {
@@ -181,31 +167,6 @@ function App() {
                 )}
               </div>
             </div>
-
-            {/* ── Category chips — horizontal scroll ── */}
-            {activeCategories.length > 0 && (
-              <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 pb-0.5">
-                {activeCategories.map(([cat, total]) => {
-                  const style = CATEGORY_ICONS[cat as DonationCategory] ?? CATEGORY_ICONS.other;
-                  return (
-                    <div key={cat} className="flex-shrink-0 flex items-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full pl-2.5 pr-1.5 py-1.5 shadow-sm">
-                      <span className="text-sm leading-none">{style.icon}</span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">{CATEGORY_LABELS[cat as DonationCategory]}</span>
-                      <span className={`text-xs font-bold font-mono whitespace-nowrap ${style.text}`}>{formatCurrency(total ?? 0)}</span>
-                      <button
-                        onClick={() => { setStartCategory(cat as DonationCategory); setMode('building'); }}
-                        className="w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-irs-100 dark:hover:bg-gray-600 flex items-center justify-center text-gray-400 hover:text-irs-600 transition-colors"
-                        title={`Add ${CATEGORY_LABELS[cat as DonationCategory]}`}
-                      >
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-                        </svg>
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
 
             {/* ── Sort + Actions row ── */}
             <div className="flex items-center justify-between gap-2 flex-wrap">
