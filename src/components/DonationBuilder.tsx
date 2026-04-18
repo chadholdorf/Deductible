@@ -260,7 +260,7 @@ export function DonationBuilder({ editingRecord, startCategory, onSave, onCancel
     }
     setNearbyStatus('searching');
     try {
-      const places = await findNearbyDonationPlaces(coords.latitude, coords.longitude);
+      const places = await findNearbyDonationPlaces(coords.latitude, coords.longitude, 15000, organization || undefined);
       if (places.length === 0) {
         setNearbyStatus('error');
         setNearbyError('No donation centers found nearby. Try typing a name manually.');
