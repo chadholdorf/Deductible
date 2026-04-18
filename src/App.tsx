@@ -180,18 +180,20 @@ function App() {
                   </svg>
                   New Donation
                 </button>
-                <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-0.5 gap-0.5">
-                {([['date', 'Date ↓'], ['amount', 'Amount'], ['charity', 'Charity']] as const).map(([key, label]) => (
-                  <button key={key} onClick={() => setSortMode(key)}
-                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors min-h-[32px] ${
-                      sortMode === key
-                        ? 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm'
-                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-                    }`}>
-                    {label}
-                  </button>
-                ))}
-                </div>
+                {yearRecords.length > 1 && (
+                  <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-0.5 gap-0.5">
+                    {([['date', 'Date ↓'], ['amount', 'Amount'], ['charity', 'Charity']] as const).map(([key, label]) => (
+                      <button key={key} onClick={() => setSortMode(key)}
+                        className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors min-h-[32px] ${
+                          sortMode === key
+                            ? 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm'
+                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                        }`}>
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               <div className="flex items-center gap-1.5 flex-wrap">
                 <ExportCSV records={yearRecords} taxYear={selectedYear} />
