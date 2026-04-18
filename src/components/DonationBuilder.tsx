@@ -84,6 +84,13 @@ export function DonationBuilder({ editingRecord, startCategory, onSave, onCancel
   const [showNearbyDropdown, setShowNearbyDropdown] = useState(false);
   const nearbyRef = useRef<HTMLDivElement>(null);
 
+  // Recent organizations
+  const RECENTS_KEY = 'its-deductible-recent-orgs';
+  const [recentOrgs, setRecentOrgs] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem(RECENTS_KEY) ?? '[]'); } catch { return []; }
+  });
+  const [showRecentsDropdown, setShowRecentsDropdown] = useState(false);
+
   useEffect(() => {
     if (editingRecord) {
       setItems(editingRecord.items);
@@ -100,6 +107,7 @@ export function DonationBuilder({ editingRecord, startCategory, onSave, onCancel
       }
       if (nearbyRef.current && !nearbyRef.current.contains(e.target as Node)) {
         setShowNearbyDropdown(false);
+        setShowRecentsDropdown(false);
       }
     }
     document.addEventListener('mousedown', handleClick);
@@ -213,6 +221,14 @@ export function DonationBuilder({ editingRecord, startCategory, onSave, onCancel
     setItems(prev => prev.filter(i => i.id !== id));
   }
 
+  function updateRecentOrgs(name: string) {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    const updated = [trimmed, ...recentOrgs.filter(o => o !== trimmed)].slice(0, 6);
+    setRecentOrgs(updated);
+    localStorage.setItem(RECENTS_KEY, JSON.stringify(updated));
+  }
+
   function handleSave() {
     const errs: string[] = [];
     if (items.length === 0) errs.push('Add at least one item to the list.');
@@ -221,6 +237,7 @@ export function DonationBuilder({ editingRecord, startCategory, onSave, onCancel
     setErrors(errs);
     if (errs.length) return;
     const taxYear = new Date(date + 'T00:00:00').getFullYear();
+    updateRecentOrgs(organization);
     onSave({ organization: organization.trim(), date, taxYear, items });
   }
 
@@ -229,6 +246,7 @@ export function DonationBuilder({ editingRecord, startCategory, onSave, onCancel
     setNearbyError('');
     setNearbyPlaces([]);
     setShowNearbyDropdown(false);
+    setShowRecentsDropdown(false);
     setNearbyStatus('locating');
     let coords: GeolocationCoordinates;
     try {
@@ -585,7 +603,8 @@ export function DonationBuilder({ editingRecord, startCategory, onSave, onCancel
                 <input
                   type="text"
                   value={organization}
-                  onChange={e => setOrganization(e.target.value)}
+                  onChange={e => { setOrganization(e.target.value); if (recentOrgs.length > 0) setShowRecentsDropdown(true); }}
+                  onFocus={() => { if (recentOrgs.length > 0) setShowRecentsDropdown(true); }}
                   className="flex-1 border border-irs-200 rounded px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-irs-400"
                   placeholder="e.g., Goodwill Industries"
                   autoComplete="off"
@@ -631,6 +650,33 @@ export function DonationBuilder({ editingRecord, startCategory, onSave, onCancel
               {nearbyStatus === 'error' && nearbyError && (
                 <p className="mt-1 text-xs text-amber-600">{nearbyError}</p>
               )}
+
+              {/* Recents dropdown */}
+              {showRecentsDropdown && !showNearbyDropdown && (() => {
+                const filtered = recentOrgs.filter(o =>
+                  !organization.trim() || o.toLowerCase().includes(organization.toLowerCase())
+                );
+                return filtered.length > 0 ? (
+                  <div className="absolute left-0 right-0 top-full mt-1 bg-white dark:bg-gray-800 border border-irs-200 dark:border-gray-600 rounded-lg shadow-lg z-20 overflow-hidden">
+                    <div className="px-3 py-1.5 border-b border-irs-100 dark:border-gray-700 text-xs text-irs-400 dark:text-gray-500 font-medium flex items-center gap-1.5">
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Recent organizations
+                    </div>
+                    {filtered.map(org => (
+                      <button key={org} type="button"
+                        onClick={() => { setOrganization(org); setShowRecentsDropdown(false); }}
+                        className="w-full text-left px-3 py-2.5 hover:bg-irs-50 dark:hover:bg-gray-700 active:bg-irs-100 transition-colors border-b border-irs-50 dark:border-gray-700 last:border-0 text-sm text-irs-800 dark:text-gray-200 min-h-[44px] flex items-center gap-2">
+                        <svg className="w-3.5 h-3.5 text-irs-300 dark:text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                        {org}
+                      </button>
+                    ))}
+                  </div>
+                ) : null;
+              })()}
 
               {showNearbyDropdown && nearbyPlaces.length > 0 && (
                 <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-irs-200 rounded-lg shadow-lg z-20 max-h-56 overflow-y-auto">
