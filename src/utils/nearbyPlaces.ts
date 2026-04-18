@@ -17,6 +17,24 @@ function haversineMiles(lat1: number, lng1: number, lat2: number, lng2: number):
   return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) * 10) / 10;
 }
 
+const BRAND_FULL_NAMES: Record<string, string> = {
+  'goodwill': 'Goodwill Store & Donation Center',
+  'salvation army': 'The Salvation Army Family Store & Donation Center',
+  'savers': 'Savers Thrift Store',
+  'value village': 'Value Village Thrift Store',
+  'habitat for humanity': 'Habitat for Humanity ReStore',
+  'arc': 'The Arc Thrift Store',
+  'st. vincent de paul': "St. Vincent de Paul Thrift Store",
+  'st vincent de paul': "St. Vincent de Paul Thrift Store",
+  'amvets': 'AMVETS Thrift Store',
+  'purple heart': 'Purple Heart Pickup',
+  'vietnam veterans': 'Vietnam Veterans of America Donation Center',
+};
+
+function expandName(name: string): string {
+  return BRAND_FULL_NAMES[name.toLowerCase().trim()] ?? name;
+}
+
 const NAME_PATTERN =
   'Goodwill|Salvation Army|Habitat for Humanity|Thrift|Donate|Donation|Vietnam Veterans|Purple Heart|AmVets|Deseret|Arc |St\\.? Vincent|Savers|Value Village|Oxfam|Scope|Cancer Research|DAV |Volunteers of America|Pickup Please|Dress for Success';
 
@@ -59,7 +77,7 @@ out center tags;
         ? `${tags['addr:housenumber']} ${tags['addr:street']}`
         : tags['addr:street'];
     const addressParts = [street, tags['addr:city'], tags['addr:state']].filter(Boolean);
-    places.push({ id: el.id, name, distance, address: addressParts.length ? addressParts.join(', ') : undefined });
+    places.push({ id: el.id, name: expandName(name), distance, address: addressParts.length ? addressParts.join(', ') : undefined });
   }
   return places;
 }
@@ -92,7 +110,7 @@ async function queryNominatim(lat: number, lng: number, hint: string): Promise<N
     const addressParts = [street, addr.city || addr.town || addr.village, addr.state].filter(Boolean);
     places.push({
       id: parseInt(el.osm_id ?? '0', 10),
-      name,
+      name: expandName(name),
       distance,
       address: addressParts.length ? addressParts.join(', ') : undefined,
     });
