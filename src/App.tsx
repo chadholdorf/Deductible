@@ -170,7 +170,17 @@ function App() {
 
             {/* ── Sort + Actions row ── */}
             <div className="flex items-center justify-between gap-2 flex-wrap">
-              <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-0.5 gap-0.5">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => { setStartCategory(null); setMode('building'); }}
+                  className="flex items-center gap-1.5 px-4 py-2 bg-irs-700 dark:bg-irs-600 text-white rounded-lg hover:bg-irs-800 dark:hover:bg-irs-700 active:bg-irs-900 transition-colors text-sm font-semibold min-h-[36px]"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  New Donation
+                </button>
+                <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-0.5 gap-0.5">
                 {([['date', 'Date ↓'], ['amount', 'Amount'], ['charity', 'Charity']] as const).map(([key, label]) => (
                   <button key={key} onClick={() => setSortMode(key)}
                     className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors min-h-[32px] ${
@@ -181,6 +191,7 @@ function App() {
                     {label}
                   </button>
                 ))}
+                </div>
               </div>
               <div className="flex items-center gap-1.5 flex-wrap">
                 <ExportCSV records={yearRecords} taxYear={selectedYear} />
@@ -228,20 +239,6 @@ function App() {
           </>
         )}
 
-        {/* ── Floating New Donation Button ── */}
-        {mode === 'view' && (
-          <div className="fixed bottom-6 right-6 z-30 print:hidden">
-            <button
-              onClick={() => { setStartCategory(null); setMode('building'); }}
-              className="flex items-center gap-2 px-5 py-3.5 bg-irs-700 dark:bg-irs-600 text-white rounded-full shadow-lg hover:bg-irs-800 dark:hover:bg-irs-700 active:bg-irs-900 transition-colors text-sm font-semibold min-h-[52px]"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              New Donation
-            </button>
-          </div>
-        )}
       </main>
 
       {/* Footer */}
