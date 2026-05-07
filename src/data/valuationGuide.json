@@ -49,6 +49,7 @@
   { "category": "Women's Clothing", "item": "Sweatpants", "low": 3, "high": 12, "unit": "each" },
   { "category": "Women's Clothing", "item": "Hoodie", "low": 4, "high": 16, "unit": "each" },
   { "category": "Women's Clothing", "item": "Romper", "low": 4, "high": 14, "unit": "each" },
+  { "category": "Women's Clothing", "item": "Lingerie", "low": 2, "high": 10, "unit": "each" },
   { "category": "Women's Clothing", "item": "Cardigan", "low": 4, "high": 12, "unit": "each" },
   { "category": "Women's Clothing", "item": "Casual Dress", "low": 6, "high": 20, "unit": "each" },
   { "category": "Women's Clothing", "item": "Formal Dress", "low": 12, "high": 50, "unit": "each" },
