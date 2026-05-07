@@ -298,5 +298,10 @@
   { "category": "Books, Media & Toys", "item": "Baby Stroller", "low": 10, "high": 50, "unit": "each" },
   { "category": "Books, Media & Toys", "item": "Car Seat (child)", "low": 10, "high": 40, "unit": "each" },
   { "category": "Books, Media & Toys", "item": "Playpen / Pack-n-Play", "low": 8, "high": 30, "unit": "each" },
-  { "category": "Books, Media & Toys", "item": "Swing Set (outdoor)", "low": 25, "high": 100, "unit": "each" }
+  { "category": "Books, Media & Toys", "item": "Swing Set (outdoor)", "low": 25, "high": 100, "unit": "each" },
+  { "category": "Household Items", "item": "Pet Clothing", "low": 1, "high": 5, "unit": "each" },
+  { "category": "Household Items", "item": "Pet Bed", "low": 5, "high": 20, "unit": "each" },
+  { "category": "Household Items", "item": "Pet Carrier", "low": 8, "high": 25, "unit": "each" },
+  { "category": "Household Items", "item": "Pet Crate / Kennel", "low": 10, "high": 40, "unit": "each" },
+  { "category": "Household Items", "item": "Pet Bowls", "low": 1, "high": 5, "unit": "each" }
 ]
