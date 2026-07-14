@@ -99,7 +99,11 @@
   { "category": "Women's Clothing", "item": "Tote Bag", "low": 3, "high": 12, "unit": "each" },
   { "category": "Women's Clothing", "item": "Backpack (fashion)", "low": 5, "high": 18, "unit": "each" },
   { "category": "Women's Clothing", "item": "Sunglasses", "low": 2, "high": 10, "unit": "each" },
+  { "category": "Women's Clothing", "item": "Sunglasses Case", "low": 1, "high": 5, "unit": "each" },
   { "category": "Women's Clothing", "item": "Hair Accessories (set)", "low": 1, "high": 4, "unit": "set" },
+  { "category": "Women's Clothing", "item": "Headband", "low": 1, "high": 4, "unit": "each" },
+  { "category": "Women's Clothing", "item": "Cosmetic Bag / Makeup Bag", "low": 2, "high": 8, "unit": "each" },
+  { "category": "Women's Clothing", "item": "Makeup Brushes (set)", "low": 3, "high": 12, "unit": "set" },
   { "category": "Women's Clothing", "item": "Jewelry (fine, per piece)", "low": 10, "high": 75, "unit": "each" },
   { "category": "Women's Clothing", "item": "Designer Handbag", "low": 20, "high": 150, "unit": "each" },
   { "category": "Women's Clothing", "item": "Wallet / Clutch", "low": 3, "high": 10, "unit": "each" },
@@ -211,6 +215,8 @@
   { "category": "Household Items", "item": "Storage Bins / Containers", "low": 2, "high": 6, "unit": "each" },
   { "category": "Household Items", "item": "Hangers (lot of 20)", "low": 2, "high": 5, "unit": "lot" },
   { "category": "Household Items", "item": "Bathroom Scale", "low": 3, "high": 8, "unit": "each" },
+  { "category": "Household Items", "item": "Toilet Paper Holder", "low": 2, "high": 8, "unit": "each" },
+  { "category": "Household Items", "item": "Shoelaces (pair)", "low": 1, "high": 3, "unit": "pair" },
 
   { "category": "Electronics", "item": "Flat Screen TV (32\" or smaller)", "low": 20, "high": 75, "unit": "each" },
   { "category": "Electronics", "item": "Flat Screen TV (33\"–50\")", "low": 40, "high": 150, "unit": "each" },
@@ -240,6 +246,7 @@
   { "category": "Electronics", "item": "Keyboard / Mouse", "low": 3, "high": 10, "unit": "each" },
   { "category": "Electronics", "item": "External Hard Drive", "low": 5, "high": 20, "unit": "each" },
   { "category": "Electronics", "item": "Smart Watch", "low": 20, "high": 100, "unit": "each" },
+  { "category": "Electronics", "item": "Red Light Therapy Device (handheld)", "low": 15, "high": 60, "unit": "each" },
 
   { "category": "Appliances", "item": "Washing Machine", "low": 50, "high": 200, "unit": "each" },
   { "category": "Appliances", "item": "Dryer", "low": 50, "high": 200, "unit": "each" },
